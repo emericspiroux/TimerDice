@@ -1,0 +1,40 @@
+{
+  "name": "api-alarm-spotify",
+  "version": "1.4.7",
+  "description": "",
+  "main": "build/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc && cp -Rf ./src/public ./build/ && cp -Rf ./src/assets ./build/ && cp .env ../.env",
+    "list": "./node_modules/forever/bin/forever list",
+    "start": "NODE_ENV=development node ./build/src/app.js",
+    "dev": "NODE_ENV=development nodemon ./src/app.ts",
+    "staging": "npm run build && NODE_ENV=staging nodemon ./build/src/app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.8",
+    "@types/express": "^4.17.8",
+    "@types/lodash": "^4.14.162",
+    "@types/mongoose": "^5.7.36",
+    "@types/node": "^14.11.10",
+    "@types/socket.io": "^2.1.11",
+    "ts-node": "^9.0.0",
+    "tsc": "^1.20150623.0",
+    "typescript": "^4.0.5"
+  },
+  "dependencies": {
+    "basic-log": "^0.1.2",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-joi-validation": "^5.0.0",
+    "joi": "^17.2.1",
+    "joi-objectid": "^3.0.1",
+    "lodash": "^4.17.20",
+    "mongoose": "4.x",
+    "querystring": "^0.2.0",
+    "socket.io": "^2.3.0"
+  }
+}
