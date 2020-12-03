@@ -9,10 +9,7 @@ class SocketServices {
   private socketPrv: SocketIOClient.Socket;
 
   constructor() {
-    this.socketPrv = SocketIOClient.io(
-      process.env.REACT_APP_WEBSOCKET_URL || '',
-      {},
-    );
+    this.socketPrv = SocketIOClient(process.env.REACT_APP_WEBSOCKET_URL || '', {});
   }
 
   get socket(): SocketIOClient.Socket {
