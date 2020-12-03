@@ -4,7 +4,7 @@ import logguer from 'basic-log';
 import { doPull, getGitLastTag } from '../libs/git';
 import AppController, { IAppController } from './Types/AppController.abstract';
 import AppRouteDescriptor from './Types/AppRouteDescriptor.type';
-import { doSetupAndReboot, getLight, getLogs, setLight } from '../libs/system';
+import { doSetupAndReboot, getLogs } from '../libs/system';
 import { PaginationValidations } from './validations/PaginationValidations';
 import FormErrorMiddleware from './validations/FormErrorMiddleware';
 import ControllerError from './Errors/ControllerError';
@@ -27,8 +27,6 @@ export default class SystemController extends AppController implements IAppContr
 		this.router.get('/logs', PaginationValidations, FormErrorMiddleware, this.getLogs.bind(this));
 		this.router.get('/update', this.getHasUpdate.bind(this));
 		this.router.get('/pwd', this.getDirName.bind(this));
-		this.router.get('/light', this.getLight.bind(this));
-		this.router.post('/light', LightValidations, FormErrorMiddleware, this.setLight.bind(this));
 		this.router.post('/update', this.doUpdate.bind(this));
 		return this.router;
 	}
@@ -67,22 +65,6 @@ export default class SystemController extends AppController implements IAppContr
 		} catch (err) {
 			next(new ControllerError(500, 'unable to get logs', err.stack));
 		}
-	}
-
-	private async getLight(_: Request, res: Response, next: NextFunction): Promise<void> {
-		try {
-			let lightLevel = await getLight();
-			res.send({ level: lightLevel });
-			logguer.d('SystemController -> getLight', lightLevel);
-		} catch (err) {
-			next(new ControllerError(500, 'unable to get light', err.stack));
-		}
-	}
-
-	private async setLight(req: Request, res: Response): Promise<void> {
-		let lightLevel = await setLight(req.body.level);
-		logguer.d('SystemController -> setLight', lightLevel);
-		res.send({ level: lightLevel });
 	}
 
 	private async getDirName(_: Request, res: Response): Promise<void> {

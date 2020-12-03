@@ -1,14 +1,14 @@
 import Serveur from './Serveur/serveur';
 import dotenv from 'dotenv';
 
-import AlarmController from './Controllers/AlarmController';
 import SocketController from './Controllers/SocketController';
-import SpotifyController from './Controllers/SpotifyController';
 import SystemController from './Controllers/SystemController';
 
 import PackageJson from '../package.json';
 
 import logger from 'basic-log';
+import DiceEngine from './libs/DiceEngine/Engine/DiceEngine';
+import DiceObject from './libs/DiceEngine/DiceObject/DiceObject';
 
 // Getting env var
 dotenv.config({
@@ -39,3 +39,8 @@ serveur.router.addController(new SystemController());
 
 // Start listenning
 serveur.start(Number(process.env.PORT));
+
+// Launching dice detection
+DiceEngine.shared.start((dice: DiceObject) => {
+	logger.i('Detect dice motion :', dice);
+});

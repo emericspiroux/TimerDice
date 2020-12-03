@@ -1,0 +1,38 @@
+language: node_js
+node_js:
+  - 'stable'
+cache:
+  directories:
+    - node_modules
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  only:
+    refs:
+      - master
+      - merge_requests
+  script:
+    - npm install
+    - npm run build
+
+unit-test:
+  stage: test
+  script:
+    - npm install
+    - npm test
+  only:
+    - master
+    - merge_requests
+
+lint:
+  stage: test
+  script:
+    - npm install
+    - npm run lint
+  only:
+    - master
+    - merge_requests

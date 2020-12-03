@@ -8,7 +8,6 @@ import logguer from 'basic-log';
 import Router from './Router';
 import IServeurConfig from './Types/IServeurConfig.type';
 import wait from '../libs/wait';
-import Jobs from '../Jobs';
 import IServeurMongoConfig from './Types/IServeurMongoConfig.type';
 import './Types/GlobalExpressRequest';
 import ControllerError from '../Controllers/Errors/ControllerError';
@@ -16,8 +15,6 @@ import SocketServeur from './Sockets/SockerServeur';
 
 import ModelError from '../Models/Errors/ModelError';
 import fs from 'fs';
-
-const npid = require('npid');
 
 export default class Serveur {
 	public app: Express = express();
@@ -31,7 +28,6 @@ export default class Serveur {
 		this.router = new Router();
 		this.initMiddleware();
 		logguer.setLevel(process.env.DEBUG_LEVEL);
-		this.setPidFile();
 	}
 
 	get config(): IServeurConfig {
@@ -69,20 +65,6 @@ export default class Serveur {
 		});
 	}
 
-	private setPidFile() {
-		try {
-			if (!process.env.PIDFILE_PATH) return;
-			var pid = npid.create(process.env.PIDFILE_PATH, true);
-			pid.removeOnExit();
-			let pidString = fs.readFileSync(process.env.PIDFILE_PATH).toString();
-			logguer.d(`Pid file setted to ${process.env.PIDFILE_PATH}`);
-			logguer.d(`current pid: ${pidString.trim()}`);
-		} catch (err) {
-			logguer.e(err);
-			process.exit(1);
-		}
-	}
-
 	private initErrorRoute() {
 		this.app.use((err: any, _1: Request, res: Response, _2: NextFunction) => {
 			logguer.e('Serveur -> initErrorRoute -> err', err);
@@ -110,21 +92,12 @@ export default class Serveur {
 		}
 	}
 
-	private async connectAgenda(config: IServeurMongoConfig) {
-		let agenda = await Jobs.start(config);
-		this.app.use((req: Request, _, next: NextFunction) => {
-			req.agenda = agenda;
-			next();
-		});
-	}
-
 	private async initCheckUpdate() {}
 
 	async start(port: number) {
 		this.port = port;
 		if (this.configPrv.mongo) {
 			await this.connectDB(this.configPrv.mongo);
-			await this.connectAgenda(this.configPrv.mongo);
 		}
 		this.initEndPointLog();
 		this.initRoutes();
