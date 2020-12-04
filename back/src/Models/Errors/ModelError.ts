@@ -2,8 +2,9 @@ export default class ModelError extends Error {
 	status: number;
 	details: object | string;
 	model: string;
+	code: string;
 
-	constructor(modelName: string, status: number, message?: string, stack?: string) {
+	constructor(modelName: string, status: number, code: string, message?: string, stack?: string) {
 		super();
 
 		Error.captureStackTrace(this, this.constructor);
@@ -11,7 +12,7 @@ export default class ModelError extends Error {
 		this.name = this.constructor.name;
 		this.model = modelName;
 		this.message = message || 'Something went wrong. Please try again.';
-
+		this.code = code;
 		this.status = status || 500;
 
 		try {
