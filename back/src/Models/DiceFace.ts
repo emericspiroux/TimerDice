@@ -5,6 +5,8 @@ const DiceFaceSchema = new Schema({
 	faceId: Number,
 	name: String,
 	color: String,
+	createdAt: Date,
+	updatedAt: Date,
 });
 
 export interface IDiceFace extends Document {
@@ -12,6 +14,8 @@ export interface IDiceFace extends Document {
 	faceId: number;
 	name: string;
 	color: string;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 // For model
@@ -40,12 +44,16 @@ DiceFaceSchema.statics.define = async function (
 	color: string
 ): Promise<IDiceFace> {
 	let element: IDiceFace = await this.findOne({ faceId });
-	if (!element) element = new this();
+	if (!element)
+		element = new this({
+			createdAt: new Date(),
+		});
 
 	element.enabled = enabled;
 	element.faceId = faceId;
 	element.name = name;
 	element.color = color;
+	element.updatedAt = new Date();
 	return await element.save();
 };
 

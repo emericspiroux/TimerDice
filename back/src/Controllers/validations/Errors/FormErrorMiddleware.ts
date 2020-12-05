@@ -1,6 +1,6 @@
 import { NextFunction, Response, Request } from 'express';
 import { ExpressJoiError } from 'express-joi-validation';
-import FormValidationError from '../Errors/FormValidationError';
+import FormValidationError from '../../Errors/FormValidationError';
 import logguer from 'basic-log';
 
 export default function FormErrorMiddleware(err: ExpressJoiError, req: Request, res: Response, next: NextFunction) {

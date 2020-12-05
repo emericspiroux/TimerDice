@@ -2,15 +2,16 @@ import Serveur from './Serveur/serveur';
 import dotenv from 'dotenv';
 
 import SocketController from './Controllers/SocketController';
-import SystemController from './Controllers/SystemController';
 
 import PackageJson from '../package.json';
 
 import logger from 'basic-log';
+
 import DiceEngine from './libs/DiceEngine/Engine/DiceEngine';
 import DiceObject from './libs/DiceEngine/DiceObject/DiceObject';
 import DiceFace from './Models/DiceFace';
 import DiceFaceTime from './Models/DiceFaceTime';
+import TimerController from './Controllers/TimerController';
 
 // Getting env var
 dotenv.config({
@@ -36,8 +37,8 @@ let serveur = new Serveur({
 });
 
 // Add controllers
+serveur.router.addController(new TimerController());
 serveur.router.addController(new SocketController());
-serveur.router.addController(new SystemController());
 
 // Start listenning
 serveur.start(Number(process.env.PORT));
@@ -46,8 +47,9 @@ serveur.start(Number(process.env.PORT));
 
 async function InitFaceDefault() {
 	const faceIds = [1, 2, 3, 4, 5, 6, 7, 8];
-	for (const faceId of faceIds) {
-		DiceFace.define(true, faceId, `Face ${faceId}`, 'blue');
+	const faceTitle = ['Code', 'Code Review', 'Réunion', 'Documentation', 'Relecture', 'Pause'];
+	for (const [index, faceId] of faceIds.entries()) {
+		DiceFace.define(true, faceId, faceTitle[index] || `Face ${faceId}`, 'blue');
 	}
 }
 
@@ -55,13 +57,21 @@ async function InitFaceDefault() {
 	await InitFaceDefault();
 	let previous = -1;
 	DiceEngine.shared.start(async (dice: DiceObject) => {
-		console.log('🚀 ~ file: app.ts ~ line 58 ~ DiceEngine.shared.start ~ dice', dice);
+		logger.i('Detect dice motion face :', dice.face);
 		if (dice.face !== previous) {
-			logger.i('Detect dice motion face :', dice.face);
+			logger.i('Not same as previous :', previous);
 			previous = dice.face;
 			try {
 				const diceFaceTimeStop = await DiceFaceTime.stop();
 				logger.d('Stoping diceFaceTime :', diceFaceTimeStop);
+				logger.d('Stoping diceFaceTime duration :', diceFaceTimeStop.duration);
+				if (
+					process.env.TIMETOUT_DURATION_BEFORE_SAVE &&
+					diceFaceTimeStop.duration < Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE)
+				) {
+					logger.d('Deleting diceFaceTime because too short :', diceFaceTimeStop.id);
+					await DiceFaceTime.deleting(diceFaceTimeStop.id);
+				}
 			} catch (err) {
 				logger.d('Error on stopping diceFaceTime :', err);
 			}
@@ -71,8 +81,9 @@ async function InitFaceDefault() {
 				logger.d('Starting diceFaceTime :', diceFaceTimeStart);
 			}
 		}
-		if (dice.isOff) {
-			DiceFaceTime.stop();
+		if (dice.isOff && previous !== -1) {
+			previous = -1;
+			await DiceFaceTime.stop();
 		}
 	});
 })();

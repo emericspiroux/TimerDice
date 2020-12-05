@@ -5,8 +5,8 @@ import JoiForObjectId from 'joi-objectid';
 const JoiObjectId = JoiForObjectId(Joi);
 const validator = createValidator({ passError: true });
 
-const idShema = {
+export const schema = {
 	id: JoiObjectId().required(),
 };
 
-export const idParamsValidation = validator.params(Joi.object(idShema));
+export const idParamsValidation = validator.params(Joi.object(schema));

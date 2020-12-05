@@ -1,11 +1,12 @@
-import { object } from 'joi';
+import { number, object } from 'joi';
 import { model, Schema, Document, Model } from 'mongoose';
-import DiceFace, { IDiceFace } from './DiceFace';
+import DiceFace, { IDiceFace, name as DiceFaceName } from './DiceFace';
 import ModelError from './Errors/ModelError';
 
 const DiceFaceTimeSchema = new Schema({
 	current: Boolean,
-	face: Object,
+	face: { type: Schema.Types.ObjectId, ref: DiceFaceName },
+	faceId: Number,
 	start: Date,
 	end: Date,
 });
@@ -14,6 +15,7 @@ export interface IDiceFaceTime extends Document {
 	id: string;
 	current: boolean;
 	face: IDiceFace;
+	faceId: number;
 	start: Date;
 	end?: Date;
 	duration: number;
@@ -49,7 +51,7 @@ DiceFaceTimeSchema.statics.getByRange = async function (
 	end?: Date,
 	faceId?: number
 ): Promise<TDiceTimeRange> {
-	let request: any = {};
+	let request: any = { current: false };
 	if (start) {
 		request.end = { $gt: start };
 	}
@@ -59,7 +61,7 @@ DiceFaceTimeSchema.statics.getByRange = async function (
 	if (faceId) {
 		request['face.faceId'] = faceId;
 	}
-	let elements: IDiceFaceTime[] = await this.find(request);
+	let elements: IDiceFaceTime[] = await this.find(request).populate('face');
 
 	let result: TDiceTimeRange = {};
 
@@ -67,7 +69,7 @@ DiceFaceTimeSchema.statics.getByRange = async function (
 		result[element.face.faceId] = result[element.face.faceId] || { elements: [], duration: 0 };
 		result[element.face.faceId].elements.push(element);
 		result[element.face.faceId].duration += element.duration;
-		result[element.face.faceId].face = element.face;
+		result[element.face.faceId].face = await DiceFace.getFace(element.face.faceId);
 	}
 
 	const sortedDurationResult = Object.entries(result)
@@ -80,6 +82,7 @@ DiceFaceTimeSchema.statics.getByRange = async function (
 DiceFaceTimeSchema.statics.start = async function (face: IDiceFace): Promise<IDiceFace> {
 	const element = new this({
 		face,
+		faceId: face.faceId,
 		start: new Date(),
 		current: true,
 	});
@@ -105,7 +108,7 @@ DiceFaceTimeSchema.statics.deleting = async function (id: string) {
 DiceFaceTimeSchema.virtual('duration').get(function () {
 	const start = new Date(this.start);
 	const end = new Date(this.end);
-	return Number(end.toTimeString()) - Number(start.toTimeString());
+	return end.valueOf() - start.valueOf();
 });
 
 DiceFaceTimeSchema.set('toJSON', { virtuals: true });
