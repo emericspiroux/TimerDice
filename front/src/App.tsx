@@ -1,23 +1,13 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Provider } from 'react-redux';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
+import RouteContent from './Routes';
 
 export default function App({ store, persistor }) {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter>
-          <Switch>
-            <Route exact path="/">
-              Home
-            </Route>
-            <Route>
-              <div>404</div>
-            </Route>
-          </Switch>
-        </BrowserRouter>
+        <RouteContent />
       </PersistGate>
     </Provider>
   );

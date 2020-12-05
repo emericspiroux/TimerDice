@@ -44,7 +44,7 @@ export default class Serveur {
 		this.router.all.forEach((route) => {
 			this.app.use(route.path, route.router);
 		});
-		this.initReactServerRoutes();
+		// this.initReactServerRoutes();
 	}
 
 	private initReactServerRoutes() {

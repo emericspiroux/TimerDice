@@ -3,10 +3,12 @@ import { routerReducer } from 'react-router-redux';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer } from 'redux-persist';
 
+import { DiceReducer } from './ducks';
+
 const persistConfig = {
   key: 'root',
   storage,
-  // whitelist: ['user'],
+  blacklist: ['dice'],
 };
 
 // const userConfig = {
@@ -16,7 +18,7 @@ const persistConfig = {
 // };
 
 const rootReducer = combineReducers({
-  // duck1,
+  dice: DiceReducer,
   routing: routerReducer,
   // user: persistReducer(userConfig, User),
 });

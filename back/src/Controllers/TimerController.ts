@@ -11,6 +11,7 @@ import ModelError from '../Models/Errors/ModelError';
 import DiceFace from '../Models/DiceFace';
 import DiceObject from '../libs/DiceEngine/DiceObject/DiceObject';
 import SocketServeur from '../Serveur/Sockets/SockerServeur';
+import NoCurrentDiceError from '../Models/Errors/DiceError';
 
 export default class DiceController extends AppController implements IAppController {
 	baseRoute: AppRouteDescriptor;
@@ -31,8 +32,8 @@ export default class DiceController extends AppController implements IAppControl
 	}
 
 	async onChangeDiceFace(dice: DiceObject) {
-		logguer.i('Detect dice motion face :', dice.face);
 		if (dice.face !== this.previous) {
+			logguer.i('Detect dice motion face :', dice.face);
 			logguer.i('Not same as this.previous :', this.previous);
 			this.previous = dice.face;
 			try {
@@ -54,20 +55,16 @@ export default class DiceController extends AppController implements IAppControl
 				const diceFaceTimeStart = await DiceFaceTime.start(diceFace);
 				SocketServeur.shared.io.emit('dice.start', diceFaceTimeStart);
 				logguer.d('Starting diceFaceTime :', diceFaceTimeStart);
-			} else {
-				SocketServeur.shared.io.emit('stop');
+			} else if (dice.isOff) {
+				logguer.i('Detect dice motion is Off :', dice.isOff);
+				SocketServeur.shared.io.emit('dice.stop');
 			}
-		}
-		if (dice.isOff && this.previous !== -1) {
-			this.previous = -1;
-			await DiceFaceTime.stop();
-			SocketServeur.shared.io.emit('dice.stop');
 		}
 	}
 
-	async InitFaceDefault() {
+	async initFaceDefault(override = false) {
 		logguer.d('DiceFaces init...');
-		if (await DiceFace.getFace(1)) return logguer.d('DiceFaces already inited. Skipped.');
+		if (!override && (await DiceFace.getFace(1))) return logguer.d('DiceFaces already inited. Skipped.');
 		const faceIds = [1, 2, 3, 4, 5, 6, 7, 8];
 		const faceTitle = [
 			'Code',
@@ -79,8 +76,14 @@ export default class DiceController extends AppController implements IAppControl
 			'debug',
 			'Write documentation',
 		];
+		const faceColor = ['rgb(33, 150, 243)'];
 		for (const [index, faceId] of faceIds.entries()) {
-			const dice = await DiceFace.define(true, faceId, faceTitle[index] || `Face ${faceId}`, 'blue');
+			const dice = await DiceFace.define(
+				true,
+				faceId,
+				faceTitle[index] || `Face ${faceId}`,
+				faceColor[index] || 'blue'
+			);
 			logguer.d('DiceFaces define :', dice);
 		}
 	}

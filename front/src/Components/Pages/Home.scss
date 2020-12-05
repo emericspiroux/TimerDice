@@ -1,0 +1,19 @@
+@import '../Styles/color';
+
+.Home {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+}
+
+$navbar_width: 60px;
+
+.Home__NavBar {
+  height: 100%;
+  width: $navbar_width;
+}
+
+.Home__content {
+  height: 100%;
+  width: 100%;
+}

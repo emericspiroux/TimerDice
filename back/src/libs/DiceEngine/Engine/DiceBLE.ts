@@ -31,7 +31,7 @@ export default class DiceBLE {
 	private discover(detectedName: string) {
 		noble.on('discover', (peripheral: any) => {
 			if (peripheral.advertisement?.localName === detectedName) {
-				logguer.d('Peri CubeTimer :', peripheral);
+				logguer.d('Peri CubeTimer :', peripheral.uuid);
 				noble.stopScanning();
 				peripheral.connect((err: any) => {
 					if (err) logguer.e('Error connecting to timerdice :', err);

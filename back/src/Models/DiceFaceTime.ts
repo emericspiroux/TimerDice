@@ -1,6 +1,7 @@
 import { number, object } from 'joi';
 import { model, Schema, Document, Model } from 'mongoose';
 import DiceFace, { IDiceFace, name as DiceFaceName } from './DiceFace';
+import NoCurrentDiceError from './Errors/DiceError';
 import ModelError from './Errors/ModelError';
 
 const DiceFaceTimeSchema = new Schema({
@@ -42,7 +43,7 @@ DiceFaceTimeSchema.statics.getAll = async function (faceId?: number) {
 
 DiceFaceTimeSchema.statics.getCurrent = async function () {
 	let current = await this.findOne({ current: true });
-	if (!current) throw new ModelError(name, 404, 'no_current', 'No current face time started');
+	if (!current) throw new NoCurrentDiceError(name);
 	return current;
 };
 
@@ -92,9 +93,6 @@ DiceFaceTimeSchema.statics.start = async function (face: IDiceFace): Promise<IDi
 
 DiceFaceTimeSchema.statics.stop = async function (): Promise<IDiceFace> {
 	const element = await this.getCurrent();
-	if (!element) {
-		throw new ModelError('DiceFaceTime', 404, 'not_found_started', `No face started`);
-	}
 	element.end = new Date();
 	element.current = false;
 

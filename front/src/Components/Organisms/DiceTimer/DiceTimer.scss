@@ -1,0 +1,24 @@
+@import '../../Styles/color';
+
+.DiceTimer {
+}
+
+.DiceTimer__content {
+  display: grid;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  grid-row-gap: 12px;
+}
+
+.DiceTimer__content__name {
+  max-width: 140px;
+  width: 100%;
+}
+
+.DiceTimer__content__timer {
+  font-size: 25px;
+  font-weight: 600;
+}
+

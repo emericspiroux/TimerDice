@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
+import './Components/Styles/common.scss';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
@@ -8,13 +9,12 @@ import SocketServices from './Services/Sockets/SocketServices';
 import * as StoreServices from './Services/Redux/StoreServices';
 
 const { store, persistor } = StoreServices.setup();
-const history = StoreServices.browserHistory;
 
 SocketServices.shared.setStore(store);
 
 ReactDOM.render(
   <React.StrictMode>
-    <App {...{ store, history, persistor }} />
+    <App {...{ store, persistor }} />
   </React.StrictMode>,
   document.getElementById('root'),
 );

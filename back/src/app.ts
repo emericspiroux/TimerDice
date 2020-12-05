@@ -44,7 +44,7 @@ dotenv.config({
 	serveur.start(Number(process.env.PORT));
 
 	// Init dices faces
-	await timerController.InitFaceDefault();
+	await timerController.initFaceDefault(true);
 
 	// Launching dice detection
 	DiceEngine.shared.start(timerController.onChangeDiceFace);
