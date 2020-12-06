@@ -22,11 +22,21 @@ export interface IDiceFaceTime extends Document {
 	duration: number;
 }
 
+export interface IEventBigCalendar {
+	title: string;
+	start: Date;
+	hexColor: string;
+	end: Date;
+	allDay?: boolean;
+	resource?: any;
+}
+
 export type TDiceTimeRange = { [faceId: number]: { face?: IDiceFace; elements: IDiceFaceTime[]; duration: number } };
 
 // For model
 export interface IDiceFaceTimeModel extends Model<IDiceFaceTime> {
 	getAll(faceId?: number): Promise<IDiceFace[]>;
+	getCalendar(start: Date, end?: Date, faceId?: number): Promise<{ IEventBigCalendar }>;
 	getCurrent(): Promise<IDiceFaceTime>;
 	getByRange(start: Date, end?: Date, faceId?: number): Promise<{ [faceId: number]: IDiceFaceTime[] }>;
 	start(face: IDiceFace): Promise<IDiceFaceTime>;
@@ -39,6 +49,38 @@ export interface IDiceFaceTimeModel extends Model<IDiceFaceTime> {
 
 DiceFaceTimeSchema.statics.getAll = async function (faceId?: number) {
 	return await this.getByRange(null, null, faceId);
+};
+
+DiceFaceTimeSchema.statics.getCalendar = async function (
+	start?: Date,
+	end?: Date,
+	faceId?: number
+): Promise<IEventBigCalendar[]> {
+	let request: any = { current: false };
+	if (start) {
+		request.end = { $gt: start };
+	}
+	if (end) {
+		request.end = { $lt: end };
+	}
+	if (faceId) {
+		request['face.faceId'] = faceId;
+	}
+	let elements: IDiceFaceTime[] = await this.find(request).populate('face');
+
+	const convertedElements: IEventBigCalendar[] = elements.map((element: IDiceFaceTime) => {
+		return {
+			start: element.start,
+			end: element.end,
+			hexColor: element.face.color,
+			title: element.face.name,
+			resource: {
+				id: element.id,
+			},
+		};
+	});
+
+	return convertedElements;
 };
 
 DiceFaceTimeSchema.statics.getCurrent = async function () {

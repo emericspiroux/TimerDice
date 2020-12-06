@@ -1,4 +1,6 @@
 @import '../Styles/color';
+@import 'react-big-calendar/lib/sass/styles';
+@import 'react-big-calendar/lib/addons/dragAndDrop/styles';
 
 .CurrentDicePage {
   height: 100vh;
@@ -16,4 +18,19 @@ $navbar_width: 60px;
 .CurrentDicePage__content {
   height: 100%;
   width: 100%;
+}
+
+.CurrentDicePage__diceTimerWrapper {
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.CurrentDicePage__calendarWrapper {
+  flex-grow: 1;
+  padding-top: 16px;
+  .rbc-time-header {
+    height: 0;
+  }
 }

@@ -11,7 +11,6 @@ import ModelError from '../Models/Errors/ModelError';
 import DiceFace from '../Models/DiceFace';
 import DiceObject from '../libs/DiceEngine/DiceObject/DiceObject';
 import SocketServeur from '../Serveur/Sockets/SockerServeur';
-import NoCurrentDiceError from '../Models/Errors/DiceError';
 
 export default class DiceController extends AppController implements IAppController {
 	baseRoute: AppRouteDescriptor;
@@ -27,6 +26,7 @@ export default class DiceController extends AppController implements IAppControl
 
 	getRoute(): Router {
 		this.router.get('/', DiceFaceOrDateValidations, FormErrorMiddleware, this.getRange.bind(this));
+		this.router.get('/calendar', DiceFaceOrDateValidations, FormErrorMiddleware, this.getCalendar.bind(this));
 		this.router.get('/current', this.getCurrent.bind(this));
 		return this.router;
 	}
@@ -76,7 +76,16 @@ export default class DiceController extends AppController implements IAppControl
 			'debug',
 			'Write documentation',
 		];
-		const faceColor = ['rgb(33, 150, 243)'];
+		const faceColor = [
+			'rgb(33, 150, 243)',
+			'rgb(42, 188, 208)',
+			'rgb(167, 215, 46)',
+			'rgb(254, 215, 58)',
+			'rgb(249, 185, 61)',
+			'rgb(227, 44, 105)',
+			'rgb(104, 62, 175)',
+			'rgb(56, 64, 70)',
+		];
 		for (const [index, faceId] of faceIds.entries()) {
 			const dice = await DiceFace.define(
 				true,
@@ -96,6 +105,17 @@ export default class DiceController extends AppController implements IAppControl
 			res.send(await DiceFaceTime.getByRange(start, end, face));
 		} catch (err) {
 			next(new ControllerError(500, 'unable to get range', err.stack));
+		}
+	}
+
+	private async getCalendar(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const start = (req.query['start'] && new Date(req.query['start'] as string)) || null;
+			const end = (req.query['end'] && new Date(req.query['end'] as string)) || null;
+			const face = (req.query['face'] && Number(req.query['face'] as string)) || null;
+			res.send(await DiceFaceTime.getCalendar(start, end, face));
+		} catch (err) {
+			next(new ControllerError(500, 'unable to get calendar', err.stack));
 		}
 	}
 

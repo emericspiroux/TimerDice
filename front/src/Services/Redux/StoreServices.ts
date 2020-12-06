@@ -3,14 +3,20 @@ import { persistStore } from 'redux-persist';
 import logger from 'redux-logger';
 import { createBrowserHistory } from 'history';
 import { routerMiddleware } from 'react-router-redux';
+import { multiClientMiddleware } from 'redux-axios-middleware';
 import { applyMiddleware, compose, createStore } from 'redux';
 import rootReducer, { defaultStates } from './define';
+import HttpService from '../Axios/HttpService';
 
 const browserHistory = createBrowserHistory();
 const setup = () => {
   const enhancers: any[] = [];
 
-  const middleware = [thunk, routerMiddleware(browserHistory)];
+  const middleware = [
+    thunk,
+    routerMiddleware(browserHistory),
+    multiClientMiddleware(HttpService.getAxiosClients()),
+  ];
 
   if (process.env.REACT_APP_REDUX_LOG === 'true') {
     enhancers.push(applyMiddleware(logger));
