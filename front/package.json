@@ -36,6 +36,7 @@
     "moment": "^2.29.1",
     "node-sass": "^4.14.1",
     "prop-types": "^15.7.2",
+    "qs": "^6.9.4",
     "ra-data-json-server": "^3.10.3",
     "react": "^16.14.0",
     "react-admin": "^3.10.3",

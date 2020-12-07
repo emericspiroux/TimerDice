@@ -1,14 +1,12 @@
 @import '../Styles/color';
+@import '../Styles/global.scss';
 @import 'react-big-calendar/lib/sass/styles';
 @import 'react-big-calendar/lib/addons/dragAndDrop/styles';
 
 .CurrentDicePage {
   height: 100vh;
-  width: 100vw;
   display: flex;
 }
-
-$navbar_width: 60px;
 
 .CurrentDicePage__NavBar {
   height: 100%;

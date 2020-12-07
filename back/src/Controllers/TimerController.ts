@@ -6,11 +6,13 @@ import AppRouteDescriptor from './Types/AppRouteDescriptor.type';
 import FormErrorMiddleware from './validations/Errors/FormErrorMiddleware';
 import ControllerError from './Errors/ControllerError';
 import { DiceFaceOrDateValidations } from './validations/Organismes/DiceFaceOrDateValidations';
-import DiceFaceTime from '../Models/DiceFaceTime';
+import { DiceFaceTimeUpdateBodyValidations } from './validations/Atoms/Body/DiceFaceTimeUpdateValidations';
+import DiceFaceTime, { IDiceFaceTimeUpdateBody } from '../Models/DiceFaceTime';
 import ModelError from '../Models/Errors/ModelError';
 import DiceFace from '../Models/DiceFace';
 import DiceObject from '../libs/DiceEngine/DiceObject/DiceObject';
 import SocketServeur from '../Serveur/Sockets/SockerServeur';
+import { idParamsValidation } from './validations/Atoms/Params/IdParamsValidations';
 
 export default class DiceController extends AppController implements IAppController {
 	baseRoute: AppRouteDescriptor;
@@ -28,6 +30,14 @@ export default class DiceController extends AppController implements IAppControl
 		this.router.get('/', DiceFaceOrDateValidations, FormErrorMiddleware, this.getRange.bind(this));
 		this.router.get('/calendar', DiceFaceOrDateValidations, FormErrorMiddleware, this.getCalendar.bind(this));
 		this.router.get('/current', this.getCurrent.bind(this));
+		this.router.patch(
+			'/:id',
+			idParamsValidation,
+			DiceFaceTimeUpdateBodyValidations,
+			FormErrorMiddleware,
+			this.update.bind(this)
+		);
+		this.router.delete('/:id', idParamsValidation, FormErrorMiddleware, this.delete.bind(this));
 		return this.router;
 	}
 
@@ -46,6 +56,7 @@ export default class DiceController extends AppController implements IAppControl
 				) {
 					logguer.d('Deleting diceFaceTime because too short :', diceFaceTimeStop.id);
 					await DiceFaceTime.deleting(diceFaceTimeStop.id);
+					SocketServeur.shared.io.emit('dice.stop');
 				}
 			} catch (err) {
 				logguer.d('Error on stopping diceFaceTime :', err);
@@ -122,6 +133,28 @@ export default class DiceController extends AppController implements IAppControl
 	private async getCurrent(_: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			res.send(await DiceFaceTime.getCurrent());
+		} catch (err) {
+			if (err instanceof ModelError) {
+				return next(err);
+			}
+			next(new ControllerError(500, 'unable to get current', err.stack));
+		}
+	}
+
+	private async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			res.send(await DiceFaceTime.updating(req.params['id'], req.body as IDiceFaceTimeUpdateBody));
+		} catch (err) {
+			if (err instanceof ModelError) {
+				return next(err);
+			}
+			next(new ControllerError(500, 'unable to get current', err.stack));
+		}
+	}
+
+	private async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			res.send(await DiceFaceTime.deleting(req.params['id']));
 		} catch (err) {
 			if (err instanceof ModelError) {
 				return next(err);

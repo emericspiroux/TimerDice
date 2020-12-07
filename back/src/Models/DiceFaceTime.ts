@@ -1,7 +1,8 @@
-import { number, object } from 'joi';
+import { number, object, string } from 'joi';
 import { model, Schema, Document, Model } from 'mongoose';
+import { start } from 'repl';
 import DiceFace, { IDiceFace, name as DiceFaceName } from './DiceFace';
-import NoCurrentDiceError from './Errors/DiceError';
+import { NoCurrentDiceError, WrongStartEndDiceError } from './Errors/DiceError';
 import ModelError from './Errors/ModelError';
 
 const DiceFaceTimeSchema = new Schema({
@@ -10,7 +11,15 @@ const DiceFaceTimeSchema = new Schema({
 	faceId: Number,
 	start: Date,
 	end: Date,
+	description: String,
 });
+
+export interface IDiceFaceTimeUpdateBody {
+	faceId?: number;
+	start?: Date;
+	end?: Date;
+	description?: string;
+}
 
 export interface IDiceFaceTime extends Document {
 	id: string;
@@ -20,6 +29,7 @@ export interface IDiceFaceTime extends Document {
 	start: Date;
 	end?: Date;
 	duration: number;
+	description?: string;
 }
 
 export interface IEventBigCalendar {
@@ -41,6 +51,7 @@ export interface IDiceFaceTimeModel extends Model<IDiceFaceTime> {
 	getByRange(start: Date, end?: Date, faceId?: number): Promise<{ [faceId: number]: IDiceFaceTime[] }>;
 	start(face: IDiceFace): Promise<IDiceFaceTime>;
 	stop(): Promise<IDiceFaceTime>;
+	updating(id: string, body: IDiceFaceTimeUpdateBody);
 	deleting(id: string): any;
 	toJSON(): IDiceFace;
 }
@@ -143,6 +154,36 @@ DiceFaceTimeSchema.statics.stop = async function (): Promise<IDiceFace> {
 
 DiceFaceTimeSchema.statics.deleting = async function (id: string) {
 	return await this.deleteOne({ id });
+};
+
+DiceFaceTimeSchema.statics.updating = async function (id: string, body: IDiceFaceTimeUpdateBody) {
+	let element = await this.findById(id);
+	if (!element) throw new NoCurrentDiceError(name);
+
+	if (body.start && body.end && new Date(body.end) <= new Date(body.start)) {
+		throw new WrongStartEndDiceError(name);
+	}
+
+	if (body.start) {
+		element.start = new Date(body.start);
+	}
+
+	if (body.end) {
+		element.end = new Date(body.end);
+	}
+
+	if (body.description) {
+		element.description = body.description;
+	}
+
+	if (body.faceId) {
+		const face = await DiceFace.getFace(body.faceId);
+		element.faceId = face.id;
+		element.face = face;
+	}
+
+	const newElement = await element.save();
+	return await newElement.populate('face').execPopulate();
 };
 
 DiceFaceTimeSchema.virtual('duration').get(function () {

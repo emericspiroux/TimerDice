@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+export const SUCCESS_SUFFIX = '_SUCCESS';
+export const ERROR_SUFFIX = '_FAIL';
+
 const HttpMethods = {
   GET: 'GET',
   POST: 'POST',

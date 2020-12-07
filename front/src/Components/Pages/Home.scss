@@ -15,5 +15,5 @@ $navbar_width: 60px;
 
 .Home__content {
   height: 100%;
-  width: 100%;
+  width: calc(100% - #{$navbar_width});
 }
