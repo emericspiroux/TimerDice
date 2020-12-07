@@ -5,12 +5,12 @@ export default function useSinceDate(startDate: Date | undefined): string {
 
   function format() {
     if (!sinceSeconds || sinceSeconds < 0) return '00:00:00';
-    const seconds = (sinceSeconds % 60).toFixed(0);
-    const minutes = ((sinceSeconds / 60) % 60).toFixed(0);
-    const hour = (Number(minutes) / 60).toFixed(0);
-    return `${`0${hour}`.slice(-2)}:${`0${minutes}`.slice(-2)}:${`0${seconds}`.slice(
+    const hours = Math.floor(sinceSeconds / 3600);
+    const minutes = Math.floor((sinceSeconds % 3600) / 60);
+    const seconds = Math.floor((sinceSeconds % 3600) % 60);
+    return `${`0${hours}`.slice(-2)}:${`0${minutes}`.slice(
       -2,
-    )}`;
+    )}:${`0${seconds}`.slice(-2)}`;
   }
 
   return format();
