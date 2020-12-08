@@ -6,7 +6,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import { useEffect } from 'react';
-import { IDiceFaceTime } from '../../Services/Redux/ducks/dice.ducks';
+import { getCurrentDiceFaceTime, IDiceFaceTime } from '../../Services/Redux/ducks/dice.ducks';
 import DiceTimer from '../Organisms/DiceTimer/DiceTimer';
 import {
   getCalendar,
@@ -46,11 +46,15 @@ export default function CurrentDicePage() {
   const currentDice: IDiceFaceTime = useSelector<IDiceFaceTime>(
     (state: any): IDiceFaceTime => _.get(state, 'dice.current'),
   );
+
+  const isLoadingCurrent: boolean = useSelector<boolean>((state: any): boolean => _.get(state, 'dice.isLoading'));
+
   const calendarEvents: IEventBigCalendar[] = useSelector<IEventBigCalendar[]>((state: any): IEventBigCalendar[] =>
     _.get(state, 'calendar.current'),
   );
 
   useEffect(() => {
+    dispatch(getCurrentDiceFaceTime());
     const startDateOnOpen = new Date();
     startDateOnOpen.setMinutes(0);
     startDateOnOpen.setHours(0);
@@ -97,7 +101,7 @@ export default function CurrentDicePage() {
   return (
     <div className="CurrentDicePage">
       <div className="CurrentDicePage__diceTimerWrapper">
-        <DiceTimer current={currentDice} />
+        <DiceTimer current={currentDice} isLoading={isLoadingCurrent} />
       </div>
       <div className="CurrentDicePage__calendarWrapper">
         <DnDCalendar

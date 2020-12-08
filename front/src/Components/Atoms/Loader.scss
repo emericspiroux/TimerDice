@@ -1,0 +1,17 @@
+@import '../Styles/color.scss';
+
+.Loader {
+  border-style: solid;
+  border-color: $grey;
+  border-top-color: $orange;
+  border-radius: 50%;
+  animation: loader 700ms infinite linear;
+  @keyframes loader {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}

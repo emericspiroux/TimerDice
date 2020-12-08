@@ -6,6 +6,9 @@
 .CurrentDicePage {
   height: 100vh;
   display: flex;
+  .rbc-current-time-indicator {
+    z-index: 0;
+  }
 }
 
 .CurrentDicePage__NavBar {

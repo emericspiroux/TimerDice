@@ -1,5 +1,5 @@
 import './NavBar.scss';
-import { useHistory } from 'react-router-dom';
+import { useHistory, NavLink } from 'react-router-dom';
 import logo from '../../../Images/logo/logo.svg';
 
 export default function NavBar() {
@@ -17,6 +17,12 @@ export default function NavBar() {
       <div className="NavBar__logoWrapper clickable" onClick={onLogoClick}>
         <img src={logo} alt="" className="NavBar__logoWrapper__image" />
       </div>
+      <NavLink
+        to="/standup"
+        className={`NavBar__logoWrapper NavBar__icon standup ${
+          window.location.pathname === '/standup' ? 'selected' : ''
+        }`}
+      />
     </div>
   );
 }

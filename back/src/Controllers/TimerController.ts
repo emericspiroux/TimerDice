@@ -48,8 +48,12 @@ export default class DiceController extends AppController implements IAppControl
 			this.previous = dice.face;
 			try {
 				const diceFaceTimeStop = await DiceFaceTime.stop();
-				logguer.d('Stoping diceFaceTime :', diceFaceTimeStop);
-				logguer.d('Stoping diceFaceTime duration :', diceFaceTimeStop.duration);
+				logguer.d('Stopping diceFaceTime :', diceFaceTimeStop);
+				logguer.d(
+					'Stopping diceFaceTime duration :',
+					diceFaceTimeStop.duration,
+					Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE)
+				);
 				if (
 					process.env.TIMETOUT_DURATION_BEFORE_SAVE &&
 					diceFaceTimeStop.duration < Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE)

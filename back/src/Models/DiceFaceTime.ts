@@ -93,7 +93,7 @@ DiceFaceTimeSchema.statics.getCalendar = async function (
 };
 
 DiceFaceTimeSchema.statics.getCurrent = async function () {
-	let current = await this.findOne({ current: true });
+	let current = await this.findOne({ current: true }).populate('face');
 	if (!current) throw new NoCurrentDiceError(name);
 	return current;
 };

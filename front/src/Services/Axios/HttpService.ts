@@ -17,6 +17,7 @@ const axiosDefault = axios.create({
 
 const configure = () => {
   axiosDefault.interceptors.response.use(async (response) => {
+    /* eslint-disable-next-line no-console */
     if (response.status !== 200) console.error(response.data);
     return response;
   });

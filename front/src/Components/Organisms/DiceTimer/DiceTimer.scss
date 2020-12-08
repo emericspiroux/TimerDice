@@ -10,6 +10,7 @@
   align-items: center;
   text-align: center;
   grid-row-gap: 12px;
+  text-align: center;
 }
 
 .DiceTimer__content__name {
@@ -20,5 +21,11 @@
 .DiceTimer__content__timer {
   font-size: 25px;
   font-weight: 600;
+}
+
+.DiceTimer__content__loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 

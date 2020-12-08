@@ -19,3 +19,16 @@
   width: 40px;
   height: 40px;
 }
+
+.NavBar__icon {
+  display: block;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  &.standup {
+    background-image: url('../../../Images/Icons/group_grey.svg');
+    &.selected {
+      background-image: url('../../../Images/Icons/group_orange.svg');
+    }
+  }
+}
