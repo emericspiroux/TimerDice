@@ -6,6 +6,7 @@ import { IDiceFaceTime } from './dice.ducks';
 const GET_CALENDAR = 'calendar/GET_CALENDAR';
 const SET_CURRENT_DATE = 'calendar/SET_CURRENT_DATE';
 const UPDATE_EVENT = 'calendar/UPDATE_EVENT';
+const DELETE_EVENT = 'calendar/DELETE_EVENT';
 
 // Types
 type TEventAction = {
@@ -14,6 +15,7 @@ type TEventAction = {
   startDate?: Date;
   endDate?: Date;
   diceFaceTimeElement?: IDiceFaceTime;
+  deletedId?: string;
   error?: any;
 };
 
@@ -23,7 +25,7 @@ export interface IEventBigCalendar {
   hexColor: string;
   end: Date;
   allDay?: boolean;
-  resource?: { id: string } & any;
+  resource: IDiceFaceTime;
 }
 
 export interface IEventBigCalendarDrop {
@@ -65,6 +67,20 @@ export default function reducer(state: any = {}, action: TEventAction = {}) {
       newState.isUpdateLoading = false;
       return newState;
     case UPDATE_EVENT + ERROR_SUFFIX:
+      newState.error = action.error;
+      newState.isDeleteLoading = false;
+      return newState;
+    case DELETE_EVENT:
+      newState.isDeleteLoading = true;
+      return newState;
+    case DELETE_EVENT + SUCCESS_SUFFIX:
+      if (Array.isArray(newState.current) && action.deletedId) {
+        newState.current = newState.current.filter((e: IEventBigCalendar) => e.resource.id !== action.deletedId);
+        newState.current = [...newState.current];
+      }
+      newState.isDeleteLoading = false;
+      return newState;
+    case DELETE_EVENT + ERROR_SUFFIX:
       newState.error = action.error;
       newState.isUpdateLoading = false;
       return newState;
@@ -116,22 +132,46 @@ export const getCalendar = (start?: Date, end?: Date, face?: number) => ({
   },
 });
 
-export const patchEvent = (
-  id: string,
-  body: { start?: Date; end?: Date; face?: number; description?: string },
-) => ({
+export const patchEvent = (id: string, options: { start?: Date; end?: Date; face?: number; description?: string }) => ({
   type: UPDATE_EVENT,
   payload: {
     request: {
       url: `/timer/${id}`,
       method: HttpService.HttpMethods.PATCH,
-      data: body,
+      data: options,
     },
     options: {
       onSuccess: ({ action, dispatch, response }) => {
         dispatch({
           type: action.type + SUCCESS_SUFFIX,
           diceFaceTimeElement: response.data,
+          meta: { previousAction: action },
+        });
+      },
+      /* eslint-disable-next-line no-unused-vars */
+      onError: ({ action, dispatch, _, error }) => {
+        dispatch({
+          type: action.type + ERROR_SUFFIX,
+          error,
+          meta: { previousAction: action },
+        });
+      },
+    },
+  },
+});
+
+export const deleteEvent = (id: string) => ({
+  type: DELETE_EVENT,
+  payload: {
+    request: {
+      url: `/timer/${id}`,
+      method: HttpService.HttpMethods.DELETE,
+    },
+    options: {
+      onSuccess: ({ action, dispatch }) => {
+        dispatch({
+          type: action.type + SUCCESS_SUFFIX,
+          deletedId: id,
           meta: { previousAction: action },
         });
       },

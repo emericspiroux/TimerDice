@@ -7,7 +7,9 @@
 	"extends": [
 		"plugin:react/recommended",
 		"airbnb",
-		"plugin:react-hooks/recommended"
+		"plugin:react-hooks/recommended",
+		"prettier",
+		"prettier/react"
 	],
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
@@ -39,7 +41,8 @@
       }
 	 ],
 	 "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".ts"] }],
-	 "operator-linebreak":"off"
+	 "operator-linebreak":"off",
+	 "max-len": ["error", {"code": 120}]
 	},
 	"settings": {
 		"import/resolver": {

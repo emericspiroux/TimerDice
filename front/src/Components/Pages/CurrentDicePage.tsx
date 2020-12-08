@@ -15,6 +15,8 @@ import {
   patchEvent,
   setCurrentDate,
 } from '../../Services/Redux/ducks/calendar.ducks';
+import { showModal } from '../../Services/Redux/ducks/modal.ducks';
+import EventCalendarOneContent from '../Organisms/ModalContents/EventCalendarOne/Content/EventCalendarOneContent';
 
 const localizer = momentLocalizer(moment);
 const startDate = new Date();
@@ -44,8 +46,8 @@ export default function CurrentDicePage() {
   const currentDice: IDiceFaceTime = useSelector<IDiceFaceTime>(
     (state: any): IDiceFaceTime => _.get(state, 'dice.current'),
   );
-  const calendarEvents: IEventBigCalendar[] = useSelector<IEventBigCalendar[]>(
-    (state: any): IEventBigCalendar[] => _.get(state, 'calendar.current'),
+  const calendarEvents: IEventBigCalendar[] = useSelector<IEventBigCalendar[]>((state: any): IEventBigCalendar[] =>
+    _.get(state, 'calendar.current'),
   );
 
   useEffect(() => {
@@ -78,11 +80,8 @@ export default function CurrentDicePage() {
     }
   }
 
-  function onSelected(data) {
-    console.log(
-      '🚀 ~ file: CurrentDicePage.tsx ~ line 74 ~ onSelected ~ data',
-      data,
-    );
+  function onSelected(data: IEventBigCalendar) {
+    dispatch(showModal(<EventCalendarOneContent eventCalendar={data} />));
   }
 
   function eventStyleGetter(event: Event, _: any, _2: any, isSelected: boolean) {
@@ -105,8 +104,6 @@ export default function CurrentDicePage() {
           localizer={localizer}
           defaultView="day"
           views={['day']}
-          scrollToTime={startDate}
-          defaultDate={new Date()}
           timeslots={4}
           step={1}
           min={minDate}
@@ -120,11 +117,9 @@ export default function CurrentDicePage() {
               }))) ||
             []
           }
-          startAccessor="start"
-          endAccessor="end"
           onEventDrop={onEventResizeOrDrop}
           onEventResize={onEventResizeOrDrop}
-          onSelected={onSelected}
+          onSelectEvent={onSelected}
           allDayAccessor={() => false}
           eventPropGetter={eventStyleGetter}
           slotPropGetter={() => ({

@@ -154,7 +154,9 @@ export default class DiceController extends AppController implements IAppControl
 
 	private async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			res.send(await DiceFaceTime.deleting(req.params['id']));
+			const deleteResult = await DiceFaceTime.deleting(req.params['id']);
+			logguer.d(`Deleted DiceFaceTime result:`, deleteResult);
+			res.send(deleteResult);
 		} catch (err) {
 			if (err instanceof ModelError) {
 				return next(err);

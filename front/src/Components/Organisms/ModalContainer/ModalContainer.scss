@@ -1,0 +1,62 @@
+$animationDuration: 200ms;
+$animationDurationLong: 500ms;
+
+$openDistance: 30px;
+
+.ModalContainer__container {
+  position: relative;
+  width: 100%;
+  max-width: fit-content;
+  display: flex;
+}
+
+.ModalContainer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-color: transparent;
+  transition: backdrop-filter $animationDuration, background-color $animationDuration;
+  backdrop-filter: blur(4px) opacity(0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  .ModalContainer__container {
+    pointer-events: none;
+    animation: closeModal;
+    animation-duration: $animationDurationLong;
+    transition: opacity $animationDurationLong;
+    opacity: 0;
+  }
+  &.show {
+    background-color: rgba($color: #000000, $alpha: 0.6);
+    backdrop-filter: blur(4px) opacity(1);
+    pointer-events: initial;
+    overflow: auto;
+    cursor: pointer;
+    .ModalContainer__container {
+      cursor: auto;
+      pointer-events: initial;
+      animation: openModal;
+      animation-duration: $animationDurationLong;
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes closeModal {
+  0% { top: 0; visibility: visible; display: block;}
+  100% { top: $openDistance; visibility: hidden;  display: none;}
+}
+
+@keyframes openModal {
+  0% { top: $openDistance; visibility: hidden;  display: none;}
+  100% { top: 0; visibility: visible; display: block;}
+}
+
+
+

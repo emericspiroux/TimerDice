@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
 import './Components/Styles/common.scss';
+import './Components/Styles/margin.scss';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 

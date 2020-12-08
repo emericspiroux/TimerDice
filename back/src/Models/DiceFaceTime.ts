@@ -85,9 +85,7 @@ DiceFaceTimeSchema.statics.getCalendar = async function (
 			end: element.end,
 			hexColor: element.face.color,
 			title: element.face.name,
-			resource: {
-				id: element.id,
-			},
+			resource: element,
 		};
 	});
 
@@ -153,7 +151,7 @@ DiceFaceTimeSchema.statics.stop = async function (): Promise<IDiceFace> {
 };
 
 DiceFaceTimeSchema.statics.deleting = async function (id: string) {
-	return await this.deleteOne({ id });
+	return await this.deleteOne({ _id: id });
 };
 
 DiceFaceTimeSchema.statics.updating = async function (id: string, body: IDiceFaceTimeUpdateBody) {
