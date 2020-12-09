@@ -99,7 +99,7 @@ export default function CurrentDicePage() {
   }
 
   return (
-    <div className="CurrentDicePage">
+    <div className="CurrentDicePage Page">
       <div className="CurrentDicePage__diceTimerWrapper">
         <DiceTimer current={currentDice} isLoading={isLoadingCurrent} />
       </div>

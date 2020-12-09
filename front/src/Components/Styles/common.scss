@@ -5,3 +5,13 @@
 textarea {
   font-family: 'Avenir Next', Arial, Helvetica, sans-serif;
 }
+
+.Page {
+  height: 100vh;
+  overflow: auto;
+}
+
+.Page-padding {
+  padding: 32px;
+  box-sizing: border-box;
+}
