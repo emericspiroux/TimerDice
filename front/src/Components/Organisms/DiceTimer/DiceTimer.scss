@@ -29,3 +29,10 @@
   justify-content: center;
 }
 
+.DiceTimer__content__update {
+  color: rgb(47, 165, 238);
+  &:hover {
+    text-decoration: underline;
+  }
+}
+

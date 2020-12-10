@@ -5,17 +5,18 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
-import { useEffect } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 import { getCurrentDiceFaceTime, IDiceFaceTime } from '../../Services/Redux/ducks/dice.ducks';
 import DiceTimer from '../Organisms/DiceTimer/DiceTimer';
 import {
+  deleteEvent,
   getCalendar,
   IEventBigCalendar,
   IEventBigCalendarDrop,
   patchEvent,
   setCurrentDate,
 } from '../../Services/Redux/ducks/calendar.ducks';
-import { showModal } from '../../Services/Redux/ducks/modal.ducks';
+import { hideModal, showModal } from '../../Services/Redux/ducks/modal.ducks';
 import EventCalendarOneContent from '../Organisms/ModalContents/EventCalendarOne/Content/EventCalendarOneContent';
 
 const localizer = momentLocalizer(moment);
@@ -60,7 +61,7 @@ export default function CurrentDicePage() {
     startDateOnOpen.setHours(0);
     startDateOnOpen.setMilliseconds(0);
     const endDateOnOpen = new Date(startDateOnOpen);
-    endDate.setDate(endDate.getDate() + 1);
+    endDateOnOpen.setDate(endDateOnOpen.getDate() + 1);
     dispatch(getCalendar(startDateOnOpen));
     dispatch(setCurrentDate(startDateOnOpen, endDateOnOpen));
   }, [dispatch]);
@@ -84,8 +85,42 @@ export default function CurrentDicePage() {
     }
   }
 
+  let timeId;
+  function onChangeDescription(value: string, event: IDiceFaceTime) {
+    if (timeId) clearTimeout(timeId);
+    timeId = setTimeout(() => {
+      dispatch(patchEvent(event.id, { description: value }));
+      if (event.id === currentDice.id) dispatch(getCurrentDiceFaceTime());
+    }, 1000);
+  }
+
+  function onDeleteEvent(event: IDiceFaceTime) {
+    dispatch(deleteEvent(event.id));
+    dispatch(hideModal());
+  }
+
   function onSelected(data: IEventBigCalendar) {
-    dispatch(showModal(<EventCalendarOneContent eventCalendar={data} />));
+    dispatch(
+      showModal(
+        <EventCalendarOneContent
+          eventCalendar={data.resource}
+          onChangeDescription={onChangeDescription}
+          onDeleteEvent={onDeleteEvent}
+        />,
+      ),
+    );
+  }
+
+  function onUpdate(data: IDiceFaceTime) {
+    dispatch(
+      showModal(
+        <EventCalendarOneContent
+          eventCalendar={data}
+          onChangeDescription={onChangeDescription}
+          onDeleteEvent={onDeleteEvent}
+        />,
+      ),
+    );
   }
 
   function eventStyleGetter(event: Event, _: any, _2: any, isSelected: boolean) {
@@ -101,7 +136,7 @@ export default function CurrentDicePage() {
   return (
     <div className="CurrentDicePage Page">
       <div className="CurrentDicePage__diceTimerWrapper">
-        <DiceTimer current={currentDice} isLoading={isLoadingCurrent} />
+        <DiceTimer current={currentDice} isLoading={isLoadingCurrent} onUpdate={onUpdate} />
       </div>
       <div className="CurrentDicePage__calendarWrapper">
         <DnDCalendar

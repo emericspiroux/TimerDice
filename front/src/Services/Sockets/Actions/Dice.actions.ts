@@ -24,7 +24,6 @@ export default class DiceAction extends SocketAction {
   private addListeningDiceFaceTimeStop() {
     this.socket.on('dice.stop', () => {
       this.store.dispatch(removeDice());
-      _.get(this.state, 'calendar.startDate');
       this.store.dispatch(getCalendar(_.get(this.state, 'calendar.startDate'), _.get(this.state, 'calendar.endDate')));
     });
   }

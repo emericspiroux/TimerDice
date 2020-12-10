@@ -1,31 +1,29 @@
-import { useRef, RefObject, useEffect } from 'react';
+import { useRef, RefObject, useEffect, ChangeEvent } from 'react';
+import moment from 'moment';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDispatch } from 'react-redux';
-import { deleteEvent, IEventBigCalendar, patchEvent } from '../../../../../Services/Redux/ducks/calendar.ducks';
 
 import './EventCalendarOneContent.scss';
 import { hideModal } from '../../../../../Services/Redux/ducks/modal.ducks';
+import { IDiceFaceTime } from '../../../../../Services/Redux/ducks/dice.ducks';
 
-export default function EventCalendarOneContent({ eventCalendar }: { eventCalendar: IEventBigCalendar }) {
+interface EventCalendarOneContentProps {
+  eventCalendar: IDiceFaceTime;
+  onChangeDescription: Function;
+  onDeleteEvent: Function;
+}
+
+export default function EventCalendarOneContent({
+  eventCalendar,
+  onChangeDescription,
+  onDeleteEvent,
+}: EventCalendarOneContentProps) {
   const dispatch = useDispatch();
   const textArea = useRef() as RefObject<HTMLTextAreaElement>;
 
   useEffect(() => {
-    if (textArea?.current) textArea.current.value = eventCalendar.resource?.description || '';
+    if (textArea?.current) textArea.current.value = eventCalendar.description || '';
   }, [textArea, eventCalendar]);
-
-  let timeId;
-  function onChangeDescription() {
-    if (timeId) clearTimeout(timeId);
-    timeId = setTimeout(() => {
-      dispatch(patchEvent(eventCalendar.resource.id, { description: textArea.current?.value }));
-    }, 1000);
-  }
-
-  function onDeleteEvent() {
-    dispatch(deleteEvent(eventCalendar.resource.id));
-    dispatch(hideModal());
-  }
 
   return (
     <div className="EventCalendarOneContent">
@@ -33,15 +31,17 @@ export default function EventCalendarOneContent({ eventCalendar }: { eventCalend
         <div className="EventCalendarOneContent__titleRow">
           <div
             className="EventCalendarOneContent__titleRow__color"
-            style={{ backgroundColor: eventCalendar.hexColor }}
+            style={{ backgroundColor: eventCalendar.face.color }}
           />
-          <div className="EventCalendarOneContent__titleRow__title">{eventCalendar?.title}</div>
+          <div className="EventCalendarOneContent__titleRow__title">{eventCalendar.face.name}</div>
         </div>
         <div className="EventCalendarOneContent__menu">
-          <div
-            className="EventCalendarOneContent__menu-button EventCalendarOneContent__menu__delete"
-            onClick={onDeleteEvent}
-          />
+          {eventCalendar.end && (
+            <div
+              className="EventCalendarOneContent__menu-button EventCalendarOneContent__menu__delete"
+              onClick={() => onDeleteEvent(eventCalendar)}
+            />
+          )}
           <div
             className="EventCalendarOneContent__menu-button EventCalendarOneContent__menu__close"
             onClick={() => dispatch(hideModal())}
@@ -49,16 +49,20 @@ export default function EventCalendarOneContent({ eventCalendar }: { eventCalend
         </div>
       </div>
       <div className="EventCalendarOneContent__timeRow xs-top">
-        <span className="EventCalendarOneContent__timeRow__start">{new Date(eventCalendar.start).toDateString()}</span>
-        &nbsp;-&nbsp;
-        <span className="EventCalendarOneContent__timeRow__end">{new Date(eventCalendar.end).toDateString()}</span>
+        <span className="EventCalendarOneContent__timeRow__start">{moment(eventCalendar.start).format('LLL')}</span>
+        {eventCalendar.end && (
+          <>
+            &nbsp;-&nbsp;
+            <span className="EventCalendarOneContent__timeRow__end">{moment(eventCalendar.end).format('LLL')}</span>
+          </>
+        )}
       </div>
       <div className="EventCalendarOneContent__descriptionRow m-top">
         <TextareaAutosize
           minRows={3}
           className="EventCalendarOneContent__descriptionRow__textArea"
           placeholder="Description..."
-          onChange={onChangeDescription}
+          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onChangeDescription(e.target.value, eventCalendar)}
           ref={textArea}
         />
       </div>

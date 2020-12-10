@@ -5,7 +5,16 @@ import useSinceDate from '../../../Hooks/Organisms/useSinceDate';
 import Loader from '../../Atoms/Loader';
 // import useSinceClock from '../../Hooks/useSinceClock';
 
-export default function DiceTimer({ current, isLoading }: { current: IDiceFaceTime | undefined; isLoading: boolean }) {
+export default function DiceTimer({
+  current,
+  isLoading,
+  onUpdate,
+}: {
+  current: IDiceFaceTime | undefined;
+  isLoading: boolean;
+  // eslint-disable-next-line
+  onUpdate: (current: IDiceFaceTime) => void;
+}) {
   const sinceDate = useSinceDate(current?.start);
   return (
     <div className="DiceTimer">
@@ -18,9 +27,13 @@ export default function DiceTimer({ current, isLoading }: { current: IDiceFaceTi
             <div className="DiceTimer__content__name" style={{ color: current?.face.color }}>
               {current?.face.name}
             </div>
-            {isLoading && (
+            {isLoading ? (
               <div className="DiceTimer__content__loader">
                 <Loader size="15px" />
+              </div>
+            ) : (
+              <div className="DiceTimer__content__update clickable" onClick={() => onUpdate(current)}>
+                Modifier
               </div>
             )}
           </div>

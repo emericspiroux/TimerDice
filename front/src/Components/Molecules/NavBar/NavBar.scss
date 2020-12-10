@@ -31,4 +31,22 @@
       background-image: url('../../../Images/Icons/group_orange.svg');
     }
   }
+  &.timer {
+    background-image: url('../../../Images/Icons/watch_grey.svg');
+    &.selected {
+      background-image: url('../../../Images/Icons/watch_orange.svg');
+    }
+  }
+  &.calendar {
+    background-image: url('../../../Images/Icons/calendar_grey.svg');
+    &.selected {
+      background-image: url('../../../Images/Icons/calendar_orange.svg');
+    }
+  }
+  &.dice {
+    background-image: url('../../../Images/Icons/dice_grey.svg');
+    &.selected {
+      background-image: url('../../../Images/Icons/dice_orange.svg');
+    }
+  }
 }
