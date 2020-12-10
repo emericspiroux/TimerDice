@@ -1,4 +1,9 @@
-// @import '../Styles/color';
+@import '../Styles/color';
 
 .StandupSummary {
+}
+
+.StandupSummary__topDate {
+  color: $grey-darker;
+  font-size: 12px;
 }

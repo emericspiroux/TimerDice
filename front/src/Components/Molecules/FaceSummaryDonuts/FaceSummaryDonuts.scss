@@ -1,0 +1,27 @@
+@import '../../Styles/color';
+
+.FaceSummaryDonuts {
+  display: flex;
+  align-items: center;
+}
+
+.FaceSummaryDonuts__donuts__center {
+  text-align: center;
+}
+
+.FaceSummaryDonuts__donuts__center__title {
+  font-size: 18px;
+}
+
+.FaceSummaryDonuts__donuts__center__total {
+  font-size: 25px;
+}
+
+.FaceSummaryDonuts__donuts {
+  margin-right: 70px;
+}
+
+.FaceSummaryDonuts__bar {
+  flex-grow: 1;
+}
+

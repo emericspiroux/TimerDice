@@ -1,3 +1,10 @@
+@import './color.scss';
+
+::selection {
+  background-color: rgba($orange, 0.8);
+  color: white;
+}
+
 .clickable {
   cursor: pointer;
 }
@@ -14,4 +21,9 @@ textarea {
 .Page-padding {
   padding: 32px;
   box-sizing: border-box;
+}
+
+.common-title {
+  font-size: 25px;
+  font-weight: 600;
 }

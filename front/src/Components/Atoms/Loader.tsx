@@ -19,7 +19,7 @@ export default function Loader({ size = '40px', isInline }: { size: string; isIn
   return (
     <div
       className="Loader"
-      style={{ width: size, height: size, borderWidth, display: isInline ? 'inline' : 'block' }}
+      style={{ width: size, height: size, borderWidth, display: isInline ? 'inline-block' : 'block' }}
     />
   );
 }

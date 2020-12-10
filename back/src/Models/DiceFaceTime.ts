@@ -41,14 +41,16 @@ export interface IEventBigCalendar {
 	resource?: any;
 }
 
-export type TDiceTimeRange = { [faceId: number]: { face?: IDiceFace; elements: IDiceFaceTime[]; duration: number } };
+export type TDiceTimeRangeObject = { face?: IDiceFace; elements: IDiceFaceTime[]; duration: number };
+
+export type TDiceTimeRange = { [faceId: number]: TDiceTimeRangeObject };
 
 // For model
 export interface IDiceFaceTimeModel extends Model<IDiceFaceTime> {
 	getAll(faceId?: number): Promise<IDiceFace[]>;
 	getCalendar(start: Date, end?: Date, faceId?: number): Promise<{ IEventBigCalendar }>;
 	getCurrent(): Promise<IDiceFaceTime>;
-	getByRange(start: Date, end?: Date, faceId?: number): Promise<{ [faceId: number]: IDiceFaceTime[] }>;
+	getByRange(start: Date, end?: Date, faceId?: number): Promise<TDiceTimeRangeObject[]>;
 	start(face: IDiceFace): Promise<IDiceFaceTime>;
 	stop(): Promise<IDiceFaceTime>;
 	updating(id: string, body: IDiceFaceTimeUpdateBody);
@@ -124,11 +126,12 @@ DiceFaceTimeSchema.statics.getByRange = async function (
 		result[element.face.faceId].face = await DiceFace.getFace(element.face.faceId);
 	}
 
-	const sortedDurationResult = Object.entries(result)
-		.sort(([, a], [, b]) => b.duration - a.duration)
-		.reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
-
-	return sortedDurationResult;
+	const sortedDurationResultArray = Object.entries(result)
+		.sort(([, a], [, b]) => {
+			return b.duration - a.duration;
+		})
+		.reduce((a, [_, c]) => a.concat(c), []);
+	return sortedDurationResultArray;
 };
 
 DiceFaceTimeSchema.statics.start = async function (face: IDiceFace): Promise<IDiceFace> {

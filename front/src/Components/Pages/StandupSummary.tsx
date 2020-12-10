@@ -2,21 +2,32 @@ import './StandupSummary.scss';
 import _ from 'lodash';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
-import { getRange, IDiceFaceTimeRange, IDiceFaceTimeRangeElement } from '../../Services/Redux/ducks/data.ducks';
-import { IDiceFaceTime } from '../../Services/Redux/ducks/dice.ducks';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { deleteEventRange, getRange, IDiceFaceTimeRangeElement } from '../../Services/Redux/ducks/data.ducks';
 import Loader from '../Atoms/Loader';
-import timestampToTime from '../../Libs/TimestampToTime/TimestampToTime';
+import FaceSummaryDescriptions from '../Molecules/FaceSummaryDescriptions/FaceSummaryDescriptions';
+import DurationTotalCount from '../../Libs/DurationTotalCount/DurationTotalCount';
+import { IDiceFaceTime } from '../../Services/Redux/ducks/dice.ducks';
+import { patchEvent } from '../../Services/Redux/ducks/calendar.ducks';
+import FaceSummaryDonuts from '../Molecules/FaceSummaryDonuts/FaceSummaryDonuts';
 
 export default function StandupSummary() {
   const dispatch = useDispatch();
   const [last24hDate] = useState<Date>(() => {
     const last24hDateDefine = new Date();
-    last24hDateDefine.setHours(last24hDateDefine.getHours() - 24);
+    last24hDateDefine.setHours(last24hDateDefine.getHours() - 26);
     return last24hDateDefine;
   });
-  const rangeEvents: IDiceFaceTimeRange = useSelector((state: any) => _.get(state, 'data.current'));
+  const rangeEvents: IDiceFaceTimeRangeElement[] = useSelector((state: any) => _.get(state, 'data.current'), []);
   const isLoading: boolean = useSelector<boolean>((state: any): boolean => _.get(state, 'data.isLoading'));
+
+  function onChangeDescription(e: ChangeEvent<HTMLTextAreaElement>, element: IDiceFaceTime) {
+    dispatch(patchEvent(element.id, { description: e.target.value }));
+  }
+
+  function onDelete(element: IDiceFaceTime) {
+    dispatch(deleteEventRange(element));
+  }
 
   useEffect(() => {
     dispatch(
@@ -26,34 +37,30 @@ export default function StandupSummary() {
     );
   }, [dispatch, last24hDate]);
 
+  const totalDuration = rangeEvents ? DurationTotalCount(rangeEvents) : 0;
+
   return (
     <div className="StandupSummary Page Page-padding">
-      <h2>Résumé des dernières 24h</h2>
-      <p>
+      <div className="common-title">Résumé des dernières 24h {isLoading && <Loader size="10px" isInline />}</div>
+      <div className="StandupSummary__topDate s-top">
         {moment(last24hDate).format('LLL')} - {moment().format('LLL')}
-      </p>
-      {rangeEvents ? (
-        <div>
-          {Object.entries(rangeEvents).map(([index, rangeEvent]: [string, IDiceFaceTimeRangeElement]) => (
-            <div key={index}>
-              <p style={{ color: rangeEvent.face.color }}>{rangeEvent.face.name}</p>
-              <ul>
-                {rangeEvent.elements
-                  .sort((a: IDiceFaceTime, b: IDiceFaceTime) => b.duration - a.duration)
-                  .map((rangeEventElement: IDiceFaceTime) => (
-                    <li>
-                      {timestampToTime(rangeEventElement.duration / 1000)} -{' '}
-                      {rangeEventElement.description || 'Pas de description'}
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div>Aucun événements ces dernières 24h</div>
-      )}
-      {isLoading && <Loader size="40px" />}
+      </div>
+      <div className="l-top">
+        {rangeEvents ? (
+          <div>
+            <FaceSummaryDonuts events={rangeEvents} totalDuration={totalDuration} />
+            <FaceSummaryDescriptions
+              className="xl-top"
+              events={rangeEvents}
+              onChangeDescription={onChangeDescription}
+              onDelete={onDelete}
+              totalDuration={totalDuration}
+            />
+          </div>
+        ) : (
+          <div>{isLoading ? 'Chargement en cours...' : 'Aucun événements ces dernières 24h'}</div>
+        )}
+      </div>
     </div>
   );
 }

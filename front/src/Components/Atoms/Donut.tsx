@@ -10,13 +10,7 @@ interface DonutProps {
   backgroundColor: string;
 }
 
-export default function Donut({
-  data,
-  borderWidth,
-  children,
-  size,
-  backgroundColor,
-}: DonutProps) {
+export default function Donut({ data, borderWidth, children, size, backgroundColor }: DonutProps) {
   const [conicGradient, setConicGradient] = useState<string>();
 
   useEffect(() => {
@@ -24,11 +18,9 @@ export default function Donut({
       const gradient: string[] = [];
       let previousDeg = 0;
       for (const percentData of data) {
-        const newDeg = 360 * ((percentData.percent || 0) / 100);
+        const newDeg = Number((360 * ((percentData.percent || 0) / 100)).toFixed(0)) + previousDeg;
         gradient.push(
-          `${percentData.color || '#2196F3'} ${
-            (previousDeg && `${previousDeg}deg `) || '0deg'
-          } ${newDeg}deg`,
+          `${percentData.color || '#2196F3'} ${(previousDeg && `${previousDeg}deg `) || '0deg'} ${newDeg}deg`,
         );
         previousDeg = newDeg;
       }

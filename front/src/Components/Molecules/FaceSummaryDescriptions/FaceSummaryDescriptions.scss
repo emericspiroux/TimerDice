@@ -1,0 +1,75 @@
+@import '../../Styles/color';
+
+.FaceSummaryDescriptions {
+}
+
+.FaceSummaryDescriptions__row {
+  display: flex;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-top: 1px solid $grey;
+}
+
+.FaceSummaryDescriptions__row__titleWrapper__title { 
+  display: flex;
+  align-items: center;
+}
+
+.FaceSummaryDescriptions__row__titleWrapper__title__dot {
+  $size: 20px;
+  width: $size;
+  height: $size;
+  margin-right: 10px;
+  border-radius: 50%;
+}
+
+.FaceSummaryDescriptions__row__titleWrapper__title {
+  padding-top: 12px;
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.FaceSummaryDescriptions__row__titleWrapper__duration {
+  color: $grey-darker;
+}
+
+.FaceSummaryDescriptions__row__descriptionsWrapper {
+  flex-grow: 1;
+}
+
+.FaceSummaryDescriptions__row__descriptionsWrapper__container {
+  padding-bottom: 12px;
+  padding-top: 12px;
+  display: flex;
+  &:not(:last-child) {
+    border-bottom: 1px solid $grey;
+  }
+}
+
+.FaceSummaryDescriptions__row__descriptionsWrapper__container__description {
+  flex-grow: 1;
+}
+
+.FaceSummaryDescriptions__row__descriptionsWrapper__container__deleteWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.FaceSummaryDescriptions__row__descriptionsWrapper__container__description__subText {
+  font-size: 12px;
+  color: $grey-darker;
+}
+
+.FaceSummaryDescriptions__container__deleteWrapper__icon {
+  $size: 20px;
+  width: $size;
+  height: $size;
+  background-position: center;
+  background-size: contain;
+  background-image: url('../../../Images/Icons/trash_grey.svg');
+  &:hover {
+    background-image: url('../../../Images/Icons/trash_red.svg');
+  }
+}
+
+
