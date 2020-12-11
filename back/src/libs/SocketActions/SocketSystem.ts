@@ -1,10 +1,19 @@
 import logguer from 'basic-log';
-import { exec } from 'child_process';
 import SocketServeur from '../../Serveur/Sockets/SockerServeur';
 
 export default class SocketSystem {
+	static disabledChange = false;
+
+	static onDisableChange(listener: SocketIO.Server) {
+		listener.on('dice.disable', (isDisabled: boolean) => {
+			logguer.d('change disable dice timer :', isDisabled);
+			SocketSystem.disabledChange = isDisabled;
+		});
+	}
+
 	static init(listener: SocketIO.Server) {
 		SocketSystem.log(listener);
+		SocketSystem.onDisableChange(listener);
 	}
 
 	static log(listener: SocketIO.Server) {

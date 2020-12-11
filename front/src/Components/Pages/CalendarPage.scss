@@ -1,0 +1,25 @@
+@import '../Styles/color';
+@import '../Styles/global.scss';
+@import 'react-big-calendar/lib/sass/styles';
+@import 'react-big-calendar/lib/addons/dragAndDrop/styles';
+
+.CalendarPage {
+  box-sizing: border-box;
+  padding-top: 16px;
+  padding-left: 16px;
+  height: 100%;
+  .rbc-current-time-indicator {
+    z-index: 0;
+  }
+  .rbc-time-header {
+    height: 17px;
+  }
+}
+
+.CalendarPage__donuts {
+  height: 400px;
+}
+
+.CalendarPage__calendar {
+  height: calc(100% - 400px);
+}

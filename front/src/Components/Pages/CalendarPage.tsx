@@ -1,12 +1,13 @@
-import './CurrentDicePage.scss';
+/* eslint-disable */
+import './CalendarPage.scss';
 import _ from 'lodash';
 import { useSelector, useDispatch } from 'react-redux';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import { useEffect } from 'react';
-import { getCurrentDiceFaceTime, IDiceFaceTime } from '../../Services/Redux/ducks/dice.ducks';
-import DiceTimer from '../Organisms/DiceTimer/DiceTimer';
+import { IDiceFaceTime } from '../../Services/Redux/ducks/dice.ducks';
+
 import {
   deleteEvent,
   getCalendar,
@@ -17,18 +18,19 @@ import {
 } from '../../Services/Redux/ducks/calendar.ducks';
 import { hideModal, showModal } from '../../Services/Redux/ducks/modal.ducks';
 import EventCalendarOneContent from '../Organisms/ModalContents/EventCalendarOne/Content/EventCalendarOneContent';
+import getMonday from '../../Libs/GetMonday/GetMonday';
+import FaceSummaryDonuts from '../Molecules/FaceSummaryDonuts/FaceSummaryDonuts';
+import DurationTotalCount from '../../Libs/DurationTotalCount/DurationTotalCount';
+import { getRange, IDiceFaceTimeRangeElement } from '../../Services/Redux/ducks/data.ducks';
 
 const localizer = momentLocalizer(moment);
 const startDate = new Date();
 const endDate = new Date(startDate);
 endDate.setHours(endDate.getHours() + 1);
 
-const minDate = new Date();
-minDate.setHours(9);
-minDate.setMinutes(0);
+const minDate = getMonday(new Date());
 const maxDate = new Date(minDate);
-maxDate.setHours(23);
-maxDate.setMinutes(0);
+maxDate.setDate(maxDate.getDate() + 7);
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -41,28 +43,18 @@ interface Event {
   resource?: any;
 }
 
-export default function CurrentDicePage() {
+export default function CalendarPage() {
   const dispatch = useDispatch();
-  const currentDice: IDiceFaceTime = useSelector<IDiceFaceTime>(
-    (state: any): IDiceFaceTime => _.get(state, 'dice.current'),
-  );
 
-  const isLoadingCurrent: boolean = useSelector<boolean>((state: any): boolean => _.get(state, 'dice.isLoading'));
-
+  const rangeEvents: IDiceFaceTimeRangeElement[] = useSelector((state: any) => _.get(state, 'data.current'), []);
   const calendarEvents: IEventBigCalendar[] = useSelector<IEventBigCalendar[]>((state: any): IEventBigCalendar[] =>
     _.get(state, 'calendar.current'),
   );
 
   useEffect(() => {
-    dispatch(getCurrentDiceFaceTime());
-    const startDateOnOpen = new Date();
-    startDateOnOpen.setMinutes(0);
-    startDateOnOpen.setHours(0);
-    startDateOnOpen.setMilliseconds(0);
-    const endDateOnOpen = new Date(startDateOnOpen);
-    endDateOnOpen.setDate(endDateOnOpen.getDate() + 1);
-    dispatch(getCalendar(startDateOnOpen));
-    dispatch(setCurrentDate(startDateOnOpen, endDateOnOpen));
+    dispatch(getCalendar(minDate));
+    dispatch(getRange({ start: minDate, end: maxDate }));
+    dispatch(setCurrentDate(minDate, maxDate));
   }, [dispatch]);
 
   function onEventResizeOrDrop(data: IEventBigCalendarDrop) {
@@ -75,12 +67,12 @@ export default function CurrentDicePage() {
   }
 
   function onRangeChange(startdateArray: Date[]) {
-    console.log('🚀 ~ file: CurrentDicePage.tsx ~ line 78 ~ onRangeChange ~ startdateArray', startdateArray);
     if (startdateArray[0]) {
       const startRangeDate = new Date(startdateArray[0]);
       const endRangeDate = new Date(startdateArray[0]);
-      endRangeDate.setDate(endRangeDate.getDate() + 1);
+      endRangeDate.setDate(endDate.getDate() + 7);
       dispatch(getCalendar(startRangeDate, endRangeDate));
+      dispatch(getRange({ start: startRangeDate, end: endRangeDate }));
       dispatch(setCurrentDate(startRangeDate, endRangeDate));
     }
   }
@@ -90,7 +82,6 @@ export default function CurrentDicePage() {
     if (timeId) clearTimeout(timeId);
     timeId = setTimeout(() => {
       dispatch(patchEvent(event.id, { description: value }));
-      if (event.id === currentDice.id) dispatch(getCurrentDiceFaceTime());
     }, 1000);
   }
 
@@ -111,18 +102,6 @@ export default function CurrentDicePage() {
     );
   }
 
-  function onUpdate(data: IDiceFaceTime) {
-    dispatch(
-      showModal(
-        <EventCalendarOneContent
-          eventCalendar={data}
-          onChangeDescription={onChangeDescription}
-          onDeleteEvent={onDeleteEvent}
-        />,
-      ),
-    );
-  }
-
   // eslint-disable-next-line no-shadow
   function eventStyleGetter(event: Event, _: any, _2: any, isSelected: boolean) {
     return {
@@ -135,43 +114,42 @@ export default function CurrentDicePage() {
   }
 
   return (
-    <div className="CurrentDicePage Page">
-      <div className="CurrentDicePage__diceTimerWrapper">
-        <DiceTimer current={currentDice} isLoading={isLoadingCurrent} onUpdate={onUpdate} />
+    <div className="CalendarPage Page">
+      <div className="CalendarPage__donuts">
+        {rangeEvents && <FaceSummaryDonuts events={rangeEvents} totalDuration={DurationTotalCount(rangeEvents)} />}
       </div>
-      <div className="CurrentDicePage__calendarWrapper">
-        <DnDCalendar
-          localizer={localizer}
-          defaultView="day"
-          views={['day']}
-          timeslots={4}
-          step={1}
-          min={minDate}
-          max={maxDate}
-          events={
-            (Array.isArray(calendarEvents) &&
-              calendarEvents.map((e: IEventBigCalendar) => ({
+      <DnDCalendar
+        localizer={localizer}
+        defaultView="work_week"
+        views={['work_week']}
+        timeslots={5}
+        step={1}
+        className="CalendarPage__calendar"
+        events={
+          (Array.isArray(calendarEvents) &&
+            calendarEvents.map((e: IEventBigCalendar) => {
+              return {
                 ...e,
                 start: new Date(e.start),
                 end: new Date(e.end),
-              }))) ||
-            []
-          }
-          onEventDrop={onEventResizeOrDrop}
-          onEventResize={onEventResizeOrDrop}
-          onSelectEvent={onSelected}
-          allDayAccessor={() => false}
-          eventPropGetter={eventStyleGetter}
-          slotPropGetter={() => ({
-            style: {
-              backgroundColor: 'white',
-            },
-          })}
-          onRangeChange={onRangeChange}
-          style={{ width: '100%' }}
-          resizable
-        />
-      </div>
+              };
+            })) ||
+          []
+        }
+        onEventDrop={onEventResizeOrDrop}
+        onEventResize={onEventResizeOrDrop}
+        onSelectEvent={onSelected}
+        allDayAccessor={() => false}
+        eventPropGetter={eventStyleGetter}
+        slotPropGetter={() => ({
+          style: {
+            backgroundColor: 'white',
+          },
+        })}
+        onRangeChange={onRangeChange}
+        style={{ height: 'calc(100% - 400px)' }}
+        resizable
+      />
     </div>
   );
 }

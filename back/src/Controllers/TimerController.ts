@@ -13,6 +13,7 @@ import DiceFace from '../Models/DiceFace';
 import DiceObject from '../libs/DiceEngine/DiceObject/DiceObject';
 import SocketServeur from '../Serveur/Sockets/SockerServeur';
 import { idParamsValidation } from './validations/Atoms/Params/IdParamsValidations';
+import SocketSystem from '../libs/SocketActions/SocketSystem';
 
 export default class DiceController extends AppController implements IAppController {
 	baseRoute: AppRouteDescriptor;
@@ -46,6 +47,17 @@ export default class DiceController extends AppController implements IAppControl
 			logguer.i('Detect dice motion face :', dice.face);
 			logguer.i('Not same as this.previous :', this.previous);
 			this.previous = dice.face;
+			if (SocketSystem.disabledChange) {
+				if (dice.face !== -1) {
+					const diceFace = await DiceFace.getFace(dice.face);
+					logguer.d('Setting dice face :', diceFace);
+					SocketServeur.shared.io.emit('dice.setting', diceFace);
+				} else {
+					logguer.d('Stop setting');
+					SocketServeur.shared.io.emit('dice.setting');
+				}
+				return;
+			}
 			try {
 				const diceFaceTimeStop = await DiceFaceTime.stop();
 				logguer.d('Stopping diceFaceTime :', diceFaceTimeStop);
@@ -54,13 +66,13 @@ export default class DiceController extends AppController implements IAppControl
 					diceFaceTimeStop.duration,
 					Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE)
 				);
+				SocketServeur.shared.io.emit('dice.stop');
 				if (
 					process.env.TIMETOUT_DURATION_BEFORE_SAVE &&
 					diceFaceTimeStop.duration < Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE)
 				) {
 					logguer.d('Deleting diceFaceTime because too short :', diceFaceTimeStop.id);
 					await DiceFaceTime.deleting(diceFaceTimeStop.id);
-					SocketServeur.shared.io.emit('dice.stop');
 				}
 			} catch (err) {
 				logguer.d('Error on stopping diceFaceTime :', err);
@@ -70,9 +82,6 @@ export default class DiceController extends AppController implements IAppControl
 				const diceFaceTimeStart = await DiceFaceTime.start(diceFace);
 				SocketServeur.shared.io.emit('dice.start', diceFaceTimeStart);
 				logguer.d('Starting diceFaceTime :', diceFaceTimeStart);
-			} else if (dice.isOff) {
-				logguer.i('Detect dice motion is Off :', dice.isOff);
-				SocketServeur.shared.io.emit('dice.stop');
 			}
 		}
 	}
