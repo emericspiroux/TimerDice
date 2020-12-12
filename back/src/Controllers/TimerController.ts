@@ -48,13 +48,17 @@ export default class DiceController extends AppController implements IAppControl
 			logguer.i('Not same as this.previous :', this.previous);
 			this.previous = dice.face;
 			if (SocketSystem.disabledChange) {
+				logguer.d('Stop setting');
+				logguer.d('Setting dice face :', dice.face);
+				await DiceFace.stopCurrentSettings();
+				SocketServeur.shared.io.emit('dice.setting');
 				if (dice.face !== -1) {
-					const diceFace = await DiceFace.getFace(dice.face);
-					logguer.d('Setting dice face :', diceFace);
-					SocketServeur.shared.io.emit('dice.setting', diceFace);
-				} else {
-					logguer.d('Stop setting');
-					SocketServeur.shared.io.emit('dice.setting');
+					try {
+						const diceFace = await DiceFace.setCurrentSettings(dice.face);
+						SocketSystem.fireSettingDice(diceFace);
+					} catch (err) {
+						logguer.d('Error on set diceFace isSettings :', err);
+					}
 				}
 				return;
 			}
@@ -83,41 +87,6 @@ export default class DiceController extends AppController implements IAppControl
 				SocketServeur.shared.io.emit('dice.start', diceFaceTimeStart);
 				logguer.d('Starting diceFaceTime :', diceFaceTimeStart);
 			}
-		}
-	}
-
-	async initFaceDefault(override = false) {
-		logguer.d('DiceFaces init...');
-		if (!override && (await DiceFace.getFace(1))) return logguer.d('DiceFaces already inited. Skipped.');
-		const faceIds = [1, 2, 3, 4, 5, 6, 7, 8];
-		const faceTitle = [
-			'Code',
-			'Code Review',
-			'Réunion',
-			'Read Documentation',
-			'Help others',
-			'Pause',
-			'debug',
-			'Write documentation',
-		];
-		const faceColor = [
-			'rgb(33, 150, 243)',
-			'rgb(42, 188, 208)',
-			'rgb(167, 215, 46)',
-			'rgb(254, 215, 58)',
-			'rgb(249, 185, 61)',
-			'rgb(227, 44, 105)',
-			'rgb(104, 62, 175)',
-			'rgb(56, 64, 70)',
-		];
-		for (const [index, faceId] of faceIds.entries()) {
-			const dice = await DiceFace.define(
-				true,
-				faceId,
-				faceTitle[index] || `Face ${faceId}`,
-				faceColor[index] || 'blue'
-			);
-			logguer.d('DiceFaces define :', dice);
 		}
 	}
 

@@ -3,7 +3,7 @@ import { routerReducer } from 'react-router-redux';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer } from 'redux-persist';
 
-import { CalendarReducer, DiceReducer, ModalReducer, DataReducer } from './ducks';
+import { CalendarReducer, DiceReducer, ModalReducer, DataReducer, SettingsReducer } from './ducks';
 
 const persistConfig = {
   key: 'root',
@@ -23,6 +23,7 @@ const rootReducer = combineReducers({
   routing: routerReducer,
   data: DataReducer,
   modal: ModalReducer,
+  settings: SettingsReducer,
   // user: persistReducer(userConfig, User),
 });
 

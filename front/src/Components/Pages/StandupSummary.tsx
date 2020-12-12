@@ -46,7 +46,7 @@ export default function StandupSummary() {
         {moment(last24hDate).format('LLL')} - {moment().format('LLL')}
       </div>
       <div className="l-top">
-        {rangeEvents ? (
+        {Array.isArray(rangeEvents) && rangeEvents.length ? (
           <div>
             <FaceSummaryDonuts events={rangeEvents} totalDuration={totalDuration} />
             <FaceSummaryDescriptions

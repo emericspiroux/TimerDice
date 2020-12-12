@@ -9,6 +9,7 @@ import logger from 'basic-log';
 
 import DiceEngine from './libs/DiceEngine/Engine/DiceEngine';
 import TimerController from './Controllers/TimerController';
+import FaceController from './Controllers/FaceController';
 
 // Getting env var
 dotenv.config({
@@ -35,16 +36,18 @@ dotenv.config({
 	});
 
 	// Add controllers
+	const faceController = new FaceController();
 	const timerController = new TimerController();
 
-	serveur.router.addController(new TimerController());
+	serveur.router.addController(faceController);
+	serveur.router.addController(timerController);
 	serveur.router.addController(new SocketController());
 
 	// Start listenning
 	serveur.start(Number(process.env.PORT));
 
 	// Init dices faces
-	await timerController.initFaceDefault(true);
+	await faceController.initFaceDefault();
 
 	// Launching dice detection
 	DiceEngine.shared.start(timerController.onChangeDiceFace);

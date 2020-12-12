@@ -2,10 +2,12 @@ import _ from 'lodash';
 import { setDice } from '../../Redux/ducks';
 import { getCalendar } from '../../Redux/ducks/calendar.ducks';
 import { IDiceFace, IDiceFaceTime, removeDice } from '../../Redux/ducks/dice.ducks';
+import { setDiceSettings } from '../../Redux/ducks/settings.ducks';
 import SocketAction from '../SocketAction';
 
 export default class DiceAction extends SocketAction {
   startListenning() {
+    this.addListeningDetectSetting();
     this.addListeningDiceFaceTimeStart();
     this.addListeningDiceFaceTimeStop();
     this.addListeningSetting();
@@ -15,6 +17,7 @@ export default class DiceAction extends SocketAction {
     this.removeListeningDiceFaceTimeStart();
     this.removeListeningDiceFaceTimeStop();
     this.removeListeningSetting();
+    this.removeListeningDetectSetting();
   }
 
   changeSettingsState(isDisabled: boolean) {
@@ -44,11 +47,21 @@ export default class DiceAction extends SocketAction {
 
   private addListeningSetting() {
     this.socket.on('dice.setting', (face: IDiceFace) => {
-      console.log('Face :', face);
+      this.store.dispatch(setDiceSettings(face));
     });
   }
 
   private removeListeningSetting() {
     this.socket.off('dice.setting');
+  }
+
+  private addListeningDetectSetting() {
+    this.socket.on('dice.setting.detect', () => {
+      if (window.location.pathname === '/settings') this.changeSettingsState(true);
+    });
+  }
+
+  private removeListeningDetectSetting() {
+    this.socket.off('dice.setting.detect');
   }
 }

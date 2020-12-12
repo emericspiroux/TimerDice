@@ -17,9 +17,10 @@ import './FaceSummaryDonuts.scss';
 interface FaceSummaryDonutsProps {
   events: IDiceFaceTimeRangeElement[];
   totalDuration: number;
+  className?: string;
 }
 
-export default function FaceSummaryDonuts({ events, totalDuration }: FaceSummaryDonutsProps) {
+export default function FaceSummaryDonuts({ events, totalDuration, className }: FaceSummaryDonutsProps) {
   // function entriesTable() {
   //   return events.map((rangeEvent: IDiceFaceTimeRangeElement) => (
   //     <div key={rangeEvent.face.faceId} className="FaceSummaryDescriptions__row">
@@ -71,7 +72,7 @@ export default function FaceSummaryDonuts({ events, totalDuration }: FaceSummary
   // }
 
   return (
-    <div className="FaceSummaryDonuts">
+    <div className={`FaceSummaryDonuts ${className || ''}`}>
       <div className="FaceSummaryDonuts__donuts">
         <Donut
           data={events
@@ -103,3 +104,7 @@ export default function FaceSummaryDonuts({ events, totalDuration }: FaceSummary
     </div>
   );
 }
+
+FaceSummaryDonuts.defaultProps = {
+  className: '',
+};

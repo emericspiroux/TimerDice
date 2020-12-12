@@ -27,3 +27,34 @@ textarea {
   font-size: 25px;
   font-weight: 600;
 }
+
+input[type=text] {
+  height: 50px;
+  font-size: 18px;
+  border-radius: 50px;
+  border: 1px solid $grey;
+  padding: 0 16px;
+  &:focus {
+    outline: none;
+  }
+}
+
+button {
+  border: none;
+  height: 50px;
+  padding: 0px 32px;
+  border-radius: 50px;
+  background-color: transparent;
+  font-size: 18px;
+  &.button-blue {
+    background-color: $blue;
+    color: white;
+  }
+  &:focus {
+    outline: none;
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}

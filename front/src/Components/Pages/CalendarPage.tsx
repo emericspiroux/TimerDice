@@ -22,6 +22,7 @@ import getMonday from '../../Libs/GetMonday/GetMonday';
 import FaceSummaryDonuts from '../Molecules/FaceSummaryDonuts/FaceSummaryDonuts';
 import DurationTotalCount from '../../Libs/DurationTotalCount/DurationTotalCount';
 import { getRange, IDiceFaceTimeRangeElement } from '../../Services/Redux/ducks/data.ducks';
+import Loader from '../Atoms/Loader';
 
 const localizer = momentLocalizer(moment);
 const startDate = new Date();
@@ -50,6 +51,13 @@ export default function CalendarPage() {
   const calendarEvents: IEventBigCalendar[] = useSelector<IEventBigCalendar[]>((state: any): IEventBigCalendar[] =>
     _.get(state, 'calendar.current'),
   );
+  const isLoading: IEventBigCalendar[] = useSelector<IEventBigCalendar[]>((state: any): IEventBigCalendar[] =>
+    _.get(state, 'calendar.isLoading'),
+  );
+  const currentDate = useSelector((state: any): { min: Date; max: Date } => ({
+    min: _.get(state, 'calendar.startDate', minDate),
+    max: _.get(state, 'calendar.endDate', maxDate),
+  }));
 
   useEffect(() => {
     dispatch(getCalendar(minDate));
@@ -70,7 +78,7 @@ export default function CalendarPage() {
     if (startdateArray[0]) {
       const startRangeDate = new Date(startdateArray[0]);
       const endRangeDate = new Date(startdateArray[0]);
-      endRangeDate.setDate(endDate.getDate() + 7);
+      endRangeDate.setDate(endRangeDate.getDate() + 7);
       dispatch(getCalendar(startRangeDate, endRangeDate));
       dispatch(getRange({ start: startRangeDate, end: endRangeDate }));
       dispatch(setCurrentDate(startRangeDate, endRangeDate));
@@ -115,41 +123,53 @@ export default function CalendarPage() {
 
   return (
     <div className="CalendarPage Page">
-      <div className="CalendarPage__donuts">
-        {rangeEvents && <FaceSummaryDonuts events={rangeEvents} totalDuration={DurationTotalCount(rangeEvents)} />}
+      <div className="common-title">Résumé par semaine {isLoading && <Loader size="10px" isInline />}</div>
+      <div className="StandupSummary__topDate s-top">
+        {moment(currentDate.min).format('LL')} - {moment(currentDate.max).format('LL')}
       </div>
-      <DnDCalendar
-        localizer={localizer}
-        defaultView="work_week"
-        views={['work_week']}
-        timeslots={5}
-        step={1}
-        className="CalendarPage__calendar"
-        events={
-          (Array.isArray(calendarEvents) &&
-            calendarEvents.map((e: IEventBigCalendar) => {
-              return {
-                ...e,
-                start: new Date(e.start),
-                end: new Date(e.end),
-              };
-            })) ||
-          []
-        }
-        onEventDrop={onEventResizeOrDrop}
-        onEventResize={onEventResizeOrDrop}
-        onSelectEvent={onSelected}
-        allDayAccessor={() => false}
-        eventPropGetter={eventStyleGetter}
-        slotPropGetter={() => ({
-          style: {
-            backgroundColor: 'white',
-          },
-        })}
-        onRangeChange={onRangeChange}
-        style={{ height: 'calc(100% - 400px)' }}
-        resizable
-      />
+      <div className="CalendarPage__info__container">
+        <div className="CalendarPage__donuts">
+          {rangeEvents && (
+            <FaceSummaryDonuts
+              className="CalendarPage__donuts__element"
+              events={rangeEvents}
+              totalDuration={DurationTotalCount(rangeEvents)}
+            />
+          )}
+        </div>
+        <div className="CalendarPage__calendar">
+          <DnDCalendar
+            localizer={localizer}
+            defaultView="work_week"
+            views={['work_week']}
+            timeslots={5}
+            step={1}
+            events={
+              (Array.isArray(calendarEvents) &&
+                calendarEvents.map((e: IEventBigCalendar) => {
+                  return {
+                    ...e,
+                    start: new Date(e.start),
+                    end: new Date(e.end),
+                  };
+                })) ||
+              []
+            }
+            onEventDrop={onEventResizeOrDrop}
+            onEventResize={onEventResizeOrDrop}
+            onSelectEvent={onSelected}
+            allDayAccessor={() => false}
+            eventPropGetter={eventStyleGetter}
+            slotPropGetter={() => ({
+              style: {
+                backgroundColor: 'white',
+              },
+            })}
+            onRangeChange={onRangeChange}
+            resizable
+          />
+        </div>
+      </div>
     </div>
   );
 }

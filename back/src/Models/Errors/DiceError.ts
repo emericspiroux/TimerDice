@@ -6,6 +6,12 @@ export class NoCurrentDiceError extends ModelError {
 	}
 }
 
+export class DiceFaceNotFoundError extends ModelError {
+	constructor(modelName: string) {
+		super(modelName, 404, 'face_no_found', 'Face object not found');
+	}
+}
+
 export class WrongStartEndDiceError extends ModelError {
 	constructor(modelName: string) {
 		super(modelName, 404, 'dice_wrong_start_end', 'End date must be after start date');

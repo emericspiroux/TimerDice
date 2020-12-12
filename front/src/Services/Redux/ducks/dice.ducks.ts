@@ -13,6 +13,7 @@ type TDiceAction = {
 };
 
 export interface IDiceFace {
+  id: string;
   enabled: boolean;
   faceId: number;
   name: string;

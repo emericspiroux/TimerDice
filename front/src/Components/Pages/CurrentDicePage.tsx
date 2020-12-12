@@ -75,7 +75,6 @@ export default function CurrentDicePage() {
   }
 
   function onRangeChange(startdateArray: Date[]) {
-    console.log('🚀 ~ file: CurrentDicePage.tsx ~ line 78 ~ onRangeChange ~ startdateArray', startdateArray);
     if (startdateArray[0]) {
       const startRangeDate = new Date(startdateArray[0]);
       const endRangeDate = new Date(startdateArray[0]);

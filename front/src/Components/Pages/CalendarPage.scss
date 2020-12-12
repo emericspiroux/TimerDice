@@ -17,9 +17,23 @@
 }
 
 .CalendarPage__donuts {
-  height: 400px;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.CalendarPage__donuts__element {
+  width: 100%;
 }
 
 .CalendarPage__calendar {
-  height: calc(100% - 400px);
+  height: 320px;
+}
+
+.CalendarPage__info__container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 50px);
+  position: relative;
 }

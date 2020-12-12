@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && cp -Rf ./src/public ./build/ && cp -Rf ./src/assets ./build/ && cp .env ../.env",
     "list": "./node_modules/forever/bin/forever list",
-    "start": "NODE_ENV=development node ./build/src/app.js",
+    "start": "node ./build/src/app.js",
     "dev": "NODE_ENV=development nodemon ./src/app.ts",
     "staging": "npm run build && NODE_ENV=staging nodemon ./build/src/app.js"
   },
