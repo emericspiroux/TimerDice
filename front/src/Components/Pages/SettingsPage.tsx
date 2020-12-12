@@ -24,6 +24,7 @@ export default function SettingsPage() {
     return () => {
       diceAction.changeSettingsState(false);
     };
+    /* eslint-disable-next-line */
   }, []);
 
   function onUpdateFace(face: IDiceFace) {
