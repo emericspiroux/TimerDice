@@ -14,7 +14,6 @@ import ControllerError from '../Controllers/Errors/ControllerError';
 import SocketServeur from './Sockets/SockerServeur';
 
 import ModelError from '../Models/Errors/ModelError';
-import fs from 'fs';
 
 export default class Serveur {
 	public app: Express = express();
@@ -27,7 +26,7 @@ export default class Serveur {
 		this.configPrv = config;
 		this.router = new Router();
 		this.initMiddleware();
-		logguer.setLevel(process.env.DEBUG_LEVEL);
+		logguer.setLevel(process.env.DEBUG_LEVEL || 'info');
 	}
 
 	get config(): IServeurConfig {
@@ -44,14 +43,14 @@ export default class Serveur {
 		this.router.all.forEach((route) => {
 			this.app.use(route.path, route.router);
 		});
-		// this.initReactServerRoutes();
+		this.initReactServerRoutes();
 	}
 
 	private initReactServerRoutes() {
-		this.app.use('/', express.static(process.env.PUBLIC_FILES_PATH));
-		this.app.use('/assets/', express.static(process.env.PUBLIC_ASSETS_PATH));
+		this.app.use('/', express.static(process.env.PUBLIC_FILES_PATH || `${__dirname}/../../public`));
+		this.app.use('/assets/', express.static(process.env.PUBLIC_ASSETS_PATH || `${__dirname}/../../assets`));
 		this.app.get('*', function (_, res) {
-			res.sendFile('index.html', { root: process.env.PUBLIC_FILES_PATH });
+			res.sendFile('index.html', { root: process.env.PUBLIC_FILES_PATH || `${__dirname}/../../public` });
 		});
 	}
 
@@ -71,7 +70,7 @@ export default class Serveur {
 			if (err instanceof ControllerError) return res.status(err.status).send(err);
 			if (err instanceof ModelError) return res.status(err.status).send(err);
 			if ('type' in err) return res.status(400).send(err);
-			if (process.env.DEBUG === 'debug' || process.env.DEBUG === 'all') return res.status(500).send(err);
+			if (logguer.level === 'debug' || logguer.level === 'all') return res.status(500).send(err);
 			res.status(500).send({ statusCode: 500, message: 'Internal error' });
 		});
 	}

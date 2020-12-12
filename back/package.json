@@ -1,39 +1,83 @@
 {
-  "name": "api-alarm-spotify",
+  "name": "timer-dice",
   "version": "1.4.7",
   "description": "",
-  "main": "build/app.js",
+  "main": "build/src/app.js",
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "src/assets/logo.icns"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "timer_dice"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ],
+      "publishers": []
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && cp -Rf ./src/public ./build/ && cp -Rf ./src/assets ./build/ && cp .env ../.env",
+    "build": "rm -rf ./build; tsc",
     "list": "./node_modules/forever/bin/forever list",
-    "start": "node ./build/src/app.js",
+    "start": "nodemon ./src/app.ts",
     "dev": "NODE_ENV=development nodemon ./src/app.ts",
-    "staging": "npm run build && NODE_ENV=staging nodemon ./build/src/app.js"
+    "electron": "npm run build && electron .",
+    "make": "npm run build && electron-forge make",
+    "staging": "npm run build && NODE_ENV=staging nodemon ./build/src/app.js",
+    "package": "electron-forge package"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.54",
+    "@electron-forge/maker-deb": "^6.0.0-beta.54",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
+    "@electron-forge/maker-zip": "^6.0.0-beta.54",
+    "@electron-forge/plugin-compile": "^6.0.0-beta.54",
     "@types/cors": "^2.8.8",
     "@types/express": "^4.17.8",
     "@types/lodash": "^4.14.162",
-    "@types/mongoose": "^5.7.36",
     "@types/node": "^14.11.10",
-    "@types/socket.io": "^2.1.11",
-    "ts-node": "^9.0.0",
+    "@types/socket.io": "^2.1.12",
+    "@types/typescript": "^2.0.0",
+    "electron": "^12.0.0-beta.9",
+    "electron-prebuilt-compile": "8.2.0",
+    "parcel-plugin-electron-dotenv": "^0.1.0",
+    "ts-node": "^9.1.1",
     "tsc": "^1.20150623.0",
-    "typescript": "^4.0.5"
+    "typescript": "^3.9.7"
   },
   "dependencies": {
+    "@abandonware/noble": "^1.9.2-10",
     "basic-log": "^0.1.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
+    "electron-squirrel-startup": "^1.0.0",
     "express": "^4.17.1",
     "express-joi-validation": "^5.0.0",
     "joi": "^17.2.1",
     "joi-objectid": "^3.0.1",
     "lodash": "^4.17.20",
-    "mongoose": "^5.11.3",
+    "mongoose": "^5.11.7",
     "napi-thread-safe-callback": "0.0.6",
     "node-addon-api": "^3.0.2",
     "querystring": "^0.2.0",

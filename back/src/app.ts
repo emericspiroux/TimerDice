@@ -11,11 +11,13 @@ import DiceEngine from './libs/DiceEngine/Engine/DiceEngine';
 import TimerController from './Controllers/TimerController';
 import FaceController from './Controllers/FaceController';
 
+import { app, BrowserWindow } from 'electron';
+
 // Getting env var
 dotenv.config({
 	path: (() => {
 		logger.i('Current version:', PackageJson.version);
-		logger.i('process.env.NODE_ENV :', process.env.NODE_ENV || 'Production');
+		logger.i('process.env.NODE_ENV :', process.env.NODE_ENV || 'production');
 		switch (process.env.NODE_ENV) {
 			case 'development':
 				return '.env.development';
@@ -31,7 +33,7 @@ dotenv.config({
 	// Creating server
 	let serveur = new Serveur({
 		mongo: {
-			uri: process.env.MONGO_URI,
+			uri: process.env.MONGO_URI || 'mongodb://localhost/DiceTimer',
 		},
 	});
 
@@ -44,11 +46,38 @@ dotenv.config({
 	serveur.router.addController(new SocketController());
 
 	// Start listenning
-	serveur.start(Number(process.env.PORT));
+	serveur.start(Number(process.env.PORT || 9999));
 
 	// Init dices faces
 	await faceController.initFaceDefault();
 
 	// Launching dice detection
 	DiceEngine.shared.start(timerController.onChangeDiceFace);
+
+	// Launch electron
+	if (process.env.NODE_ENV !== 'development') {
+		function createWindow() {
+			const win = new BrowserWindow({
+				width: 800,
+				height: 600,
+				webPreferences: {
+					nodeIntegration: true,
+				},
+			});
+			win.loadURL(process.env.FRONT_URI || 'http://localhost:9999');
+		}
+		app.whenReady().then(createWindow);
+
+		app.on('window-all-closed', () => {
+			if (process.platform !== 'darwin') {
+				app.quit();
+			}
+		});
+
+		app.on('activate', () => {
+			if (BrowserWindow.getAllWindows().length === 0) {
+				createWindow();
+			}
+		});
+	}
 })();

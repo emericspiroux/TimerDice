@@ -30,7 +30,7 @@ export default class DiceBLE {
 
 	private discover(detectedName: string) {
 		noble.on('discover', (peripheral: any) => {
-			if (peripheral.advertisement?.localName === detectedName) {
+			if (peripheral.advertisement && peripheral.advertisement.localName === detectedName) {
 				logguer.d('Peri CubeTimer :', peripheral.uuid);
 				noble.stopScanning();
 				peripheral.connect((err: any) => {

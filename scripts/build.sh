@@ -45,13 +45,6 @@ if test -d "./build"; then
   echo "Back already built"
 else
   echo "Building Back-end app..."
-  npm run build
+  npm run make
   echo "Back app is build"
 fi
-cd ../
-
-mkdir ./build
-echo "Copy to build folder"
-cp -Rf ./back/build ./
-
-echo "front and back built"

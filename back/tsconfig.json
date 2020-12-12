@@ -7,5 +7,5 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "exclude":["./build"],
+  "exclude":["./build", "./out"]
 }

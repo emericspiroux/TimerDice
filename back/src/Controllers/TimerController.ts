@@ -68,12 +68,12 @@ export default class DiceController extends AppController implements IAppControl
 				logguer.d(
 					'Stopping diceFaceTime duration :',
 					diceFaceTimeStop.duration,
-					Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE)
+					Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE || 60000)
 				);
 				SocketServeur.shared.io.emit('dice.stop');
 				if (
 					process.env.TIMETOUT_DURATION_BEFORE_SAVE &&
-					diceFaceTimeStop.duration < Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE)
+					diceFaceTimeStop.duration < Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE || 60000)
 				) {
 					logguer.d('Deleting diceFaceTime because too short :', diceFaceTimeStop.id);
 					await DiceFaceTime.deleting(diceFaceTimeStop.id);

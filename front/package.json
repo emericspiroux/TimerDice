@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "react-scripts build",
+    "build": "react-scripts build && cp -Rf ./build/ ../back/src/public",
     "eject": "react-scripts eject",
     "lint": "eslint --max-warnings=0 src/**/*.ts src/**/*.tsx",
     "start": "react-scripts start",

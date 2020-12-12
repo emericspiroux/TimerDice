@@ -27,5 +27,7 @@ back/build/assets/default.mp4
 package-lock.json
 
 .vscode
-
+out
+build
 db
+back/src/public/
