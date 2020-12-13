@@ -42,7 +42,8 @@
     "electron": "npm run build && electron .",
     "make": "npm run build && electron-forge make",
     "staging": "npm run build && NODE_ENV=staging nodemon ./build/src/app.js",
-    "package": "electron-forge package"
+    "package": "electron-forge package",
+    "mongodb:install":"rm -rf mongodb; mkdir mongodb; mkdir mongodb/db; curl https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-4.4.2.tgz --output ./mongodb/mongodb-macos.tgz && tar -xvf ./mongodb/mongodb-macos.tgz -C ./mongodb/; rm -rf ./mongodb/mongodb-macos.tgz; mv mongodb/mongodb-macos-x86_64-4.4.2/bin/mongod mongodb/; rm -rf mongodb/mongodb-macos-x86_64-4.4.2"
   },
   "author": "",
   "license": "ISC",
