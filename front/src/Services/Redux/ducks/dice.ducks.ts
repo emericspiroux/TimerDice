@@ -4,11 +4,14 @@ import HttpService, { SUCCESS_SUFFIX, ERROR_SUFFIX } from '../../Axios/HttpServi
 const SET = 'diceTime/SET';
 const REMOVE = 'diceTime/REMOVE';
 const GET_CURRENT = 'diceTime/GET_CURRENT';
+const STOP_CURRENT = 'diceTime/STOP_CURRENT';
+const GET_ALL_FACES = 'diceTime/GET_ALL_FACES';
 
 // Types
 type TDiceAction = {
   type?: string;
   diceTime?: IDiceFaceTime;
+  faces?: IDiceFace[];
   error?: any;
 };
 
@@ -54,6 +57,28 @@ export default function reducer(state: any = {}, action: TDiceAction = {}) {
       newState.isLoading = false;
       newState.error = action.error;
       return newState;
+    case STOP_CURRENT:
+      newState.isLoading = true;
+      return newState;
+    case STOP_CURRENT + SUCCESS_SUFFIX:
+      newState.isLoading = false;
+      newState.current = undefined;
+      return newState;
+    case STOP_CURRENT + ERROR_SUFFIX:
+      newState.isLoading = false;
+      newState.errorStop = action.error;
+      return newState;
+    case GET_ALL_FACES:
+      newState.isLoadingFaces = true;
+      return newState;
+    case GET_ALL_FACES + SUCCESS_SUFFIX:
+      newState.isLoadingFaces = false;
+      newState.faces = action.faces;
+      return newState;
+    case GET_ALL_FACES + ERROR_SUFFIX:
+      newState.isLoadingFaces = false;
+      newState.errorFaces = action.error;
+      return newState;
     default:
       return newState;
   }
@@ -81,6 +106,61 @@ export const getCurrentDiceFaceTime = () => ({
         dispatch({
           type: action.type + SUCCESS_SUFFIX,
           diceTime: response.data,
+          meta: { previousAction: action },
+        });
+      },
+      /* eslint-disable-next-line no-unused-vars */
+      onError: ({ action, dispatch, _, error }) => {
+        dispatch({
+          type: action.type + ERROR_SUFFIX,
+          error,
+          meta: { previousAction: action },
+        });
+      },
+    },
+  },
+});
+
+// Action Creators
+export const stopCurrentDiceFaceTime = () => ({
+  type: STOP_CURRENT,
+  payload: {
+    request: {
+      url: `/timer/current`,
+      method: HttpService.HttpMethods.DELETE,
+    },
+    options: {
+      onSuccess: ({ action, dispatch }) => {
+        dispatch({
+          type: action.type + SUCCESS_SUFFIX,
+          meta: { previousAction: action },
+        });
+      },
+      /* eslint-disable-next-line no-unused-vars */
+      onError: ({ action, dispatch, _, error }) => {
+        dispatch({
+          type: action.type + ERROR_SUFFIX,
+          error,
+          meta: { previousAction: action },
+        });
+      },
+    },
+  },
+});
+
+// Action Creators
+export const getAllFaces = () => ({
+  type: GET_ALL_FACES,
+  payload: {
+    request: {
+      url: `/face`,
+      method: HttpService.HttpMethods.GET,
+    },
+    options: {
+      onSuccess: ({ action, dispatch, response }) => {
+        dispatch({
+          type: action.type + SUCCESS_SUFFIX,
+          faces: response.data,
           meta: { previousAction: action },
         });
       },

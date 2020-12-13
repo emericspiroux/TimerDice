@@ -1,6 +1,14 @@
 import './Loader.scss';
 
-export default function Loader({ size = '40px', isInline }: { size: string; isInline?: boolean }) {
+export default function Loader({
+  size = '40px',
+  isInline,
+  className,
+}: {
+  size: string;
+  isInline?: boolean;
+  className?: string;
+}) {
   const sizeType = size.slice(-2);
   let borderWidth;
 
@@ -18,7 +26,7 @@ export default function Loader({ size = '40px', isInline }: { size: string; isIn
 
   return (
     <div
-      className="Loader"
+      className={`Loader ${className}`}
       style={{ width: size, height: size, borderWidth, display: isInline ? 'inline-block' : 'block' }}
     />
   );
@@ -26,4 +34,5 @@ export default function Loader({ size = '40px', isInline }: { size: string; isIn
 
 Loader.defaultProps = {
   isInline: false,
+  className: '',
 };

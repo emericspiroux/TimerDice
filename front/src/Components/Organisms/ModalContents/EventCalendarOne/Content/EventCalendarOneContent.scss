@@ -34,6 +34,13 @@
   cursor: pointer;
 }
 
+.EventCalendarOneContent__menu__stop {
+  background-image: url('../../../../../Images/Icons/stop_grey.svg');
+  &:hover {
+    background-image: url('../../../../../Images/Icons/stop_black.svg');
+  }
+}
+
 .EventCalendarOneContent__menu__delete {
   background-image: url('../../../../../Images/Icons/trash_grey.svg');
   &:hover {
@@ -48,17 +55,12 @@
   }
 }
 
-.EventCalendarOneContent__titleRow__color {
-  $size: 30px;
-  width: $size;
-  height: $size;
-  margin-right: 6px;
-  border-radius: 50%;
-}
-
 .EventCalendarOneContent__titleRow__title {
   font-size: 30px;
   font-weight: 600;
+  flex-grow: 1;
+  background-color: white;
+  z-index: 2;
 }
 
 .EventCalendarOneContent__timeRow {

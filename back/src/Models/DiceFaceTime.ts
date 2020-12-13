@@ -179,7 +179,7 @@ DiceFaceTimeSchema.statics.updating = async function (id: string, body: IDiceFac
 
 	if (body.faceId) {
 		const face = await DiceFace.getFace(body.faceId);
-		element.faceId = face.id;
+		element.faceId = body.faceId;
 		element.face = face;
 	}
 

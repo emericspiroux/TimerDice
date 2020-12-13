@@ -58,7 +58,9 @@ export default function StandupSummary() {
             />
           </div>
         ) : (
-          <div>{isLoading ? 'Chargement en cours...' : 'Aucun événements ces dernières 24h'}</div>
+          <div className="StandupSummary__loadingOrEmptyContainer">
+            {isLoading ? 'Chargement en cours...' : 'Aucun événements ces dernières 24h'}
+          </div>
         )}
       </div>
     </div>

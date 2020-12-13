@@ -37,3 +37,15 @@
   height: calc(100% - 50px);
   position: relative;
 }
+
+.CalendarPage__info__loaderContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: calc(100vh - 50px);
+}
+
+.CalendarPage__info__loaderContainer__loaderWrapper__text {
+  font-weight: 600;
+}

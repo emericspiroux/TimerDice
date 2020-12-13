@@ -93,6 +93,10 @@ export default function CalendarPage() {
     }, 1000);
   }
 
+  function onChangeFace(faceId: number, event: IDiceFaceTime) {
+    dispatch(patchEvent(event.id, { faceId }));
+  }
+
   function onDeleteEvent(event: IDiceFaceTime) {
     dispatch(deleteEvent(event.id));
     dispatch(hideModal());
@@ -102,8 +106,10 @@ export default function CalendarPage() {
     dispatch(
       showModal(
         <EventCalendarOneContent
+          key={data.resource.id}
           eventCalendar={data.resource}
           onChangeDescription={onChangeDescription}
+          onChangeFace={onChangeFace}
           onDeleteEvent={onDeleteEvent}
         />,
       ),
@@ -127,49 +133,60 @@ export default function CalendarPage() {
       <div className="StandupSummary__topDate s-top">
         {moment(currentDate.min).format('LL')} - {moment(currentDate.max).format('LL')}
       </div>
-      <div className="CalendarPage__info__container">
-        <div className="CalendarPage__donuts">
-          {rangeEvents && (
-            <FaceSummaryDonuts
-              className="CalendarPage__donuts__element"
-              events={rangeEvents}
-              totalDuration={DurationTotalCount(rangeEvents)}
+      {isLoading ? (
+        <div className="CalendarPage__info__loaderContainer">
+          <Loader size="40px" />
+          <div className="CalendarPage__info__loaderContainer__loaderWrapper__text l-top">
+            Chargement des données en cours...
+          </div>
+        </div>
+      ) : (
+        <div className="CalendarPage__info__container">
+          <div className="CalendarPage__donuts">
+            {Array.isArray(rangeEvents) && rangeEvents.length ? (
+              <FaceSummaryDonuts
+                className="CalendarPage__donuts__element"
+                events={rangeEvents}
+                totalDuration={DurationTotalCount(rangeEvents)}
+              />
+            ) : (
+              <div>Aucune activité enregistré cette semaine.</div>
+            )}
+          </div>
+          <div className="CalendarPage__calendar">
+            <DnDCalendar
+              localizer={localizer}
+              defaultView="work_week"
+              views={['work_week']}
+              timeslots={5}
+              step={1}
+              events={
+                (Array.isArray(calendarEvents) &&
+                  calendarEvents.map((e: IEventBigCalendar) => {
+                    return {
+                      ...e,
+                      start: new Date(e.start),
+                      end: new Date(e.end),
+                    };
+                  })) ||
+                []
+              }
+              onEventDrop={onEventResizeOrDrop}
+              onEventResize={onEventResizeOrDrop}
+              onSelectEvent={onSelected}
+              allDayAccessor={() => false}
+              eventPropGetter={eventStyleGetter}
+              slotPropGetter={() => ({
+                style: {
+                  backgroundColor: 'white',
+                },
+              })}
+              onRangeChange={onRangeChange}
+              resizable
             />
-          )}
+          </div>
         </div>
-        <div className="CalendarPage__calendar">
-          <DnDCalendar
-            localizer={localizer}
-            defaultView="work_week"
-            views={['work_week']}
-            timeslots={5}
-            step={1}
-            events={
-              (Array.isArray(calendarEvents) &&
-                calendarEvents.map((e: IEventBigCalendar) => {
-                  return {
-                    ...e,
-                    start: new Date(e.start),
-                    end: new Date(e.end),
-                  };
-                })) ||
-              []
-            }
-            onEventDrop={onEventResizeOrDrop}
-            onEventResize={onEventResizeOrDrop}
-            onSelectEvent={onSelected}
-            allDayAccessor={() => false}
-            eventPropGetter={eventStyleGetter}
-            slotPropGetter={() => ({
-              style: {
-                backgroundColor: 'white',
-              },
-            })}
-            onRangeChange={onRangeChange}
-            resizable
-          />
-        </div>
-      </div>
+      )}
     </div>
   );
 }

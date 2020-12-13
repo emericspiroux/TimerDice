@@ -1,45 +1,64 @@
-import { useRef, RefObject, useEffect, ChangeEvent } from 'react';
+import { useRef, RefObject, useEffect, ChangeEvent, useState } from 'react';
 import moment from 'moment';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDispatch } from 'react-redux';
 
 import './EventCalendarOneContent.scss';
 import { hideModal } from '../../../../../Services/Redux/ducks/modal.ducks';
-import { IDiceFaceTime } from '../../../../../Services/Redux/ducks/dice.ducks';
+import { IDiceFace, IDiceFaceTime } from '../../../../../Services/Redux/ducks/dice.ducks';
+import FaceForm from '../../../../Molecules/FaceForm/FaceForm';
 
 interface EventCalendarOneContentProps {
   eventCalendar: IDiceFaceTime;
   onChangeDescription: Function;
-  onDeleteEvent: Function;
+  onChangeFace: Function;
+  onDeleteEvent?: Function;
+  onStopEvent?: Function;
 }
 
 export default function EventCalendarOneContent({
   eventCalendar,
   onChangeDescription,
+  onChangeFace,
   onDeleteEvent,
+  onStopEvent,
 }: EventCalendarOneContentProps) {
   const dispatch = useDispatch();
   const textArea = useRef() as RefObject<HTMLTextAreaElement>;
+  const [eventCalendarCurrent, setEventCalendarCurrent] = useState(eventCalendar);
 
   useEffect(() => {
     if (textArea?.current) textArea.current.value = eventCalendar.description || '';
   }, [textArea, eventCalendar]);
 
+  function onChangeFaceElement(selected: IDiceFace) {
+    const updatedEvent: IDiceFaceTime = {
+      ...eventCalendarCurrent,
+      faceId: selected.faceId,
+      face: selected,
+    };
+    setEventCalendarCurrent(updatedEvent);
+    onChangeFace(selected.faceId, updatedEvent);
+  }
+
   return (
     <div className="EventCalendarOneContent">
       <div className="EventCalendarOneContent__top">
         <div className="EventCalendarOneContent__titleRow">
-          <div
-            className="EventCalendarOneContent__titleRow__color"
-            style={{ backgroundColor: eventCalendar.face.color }}
-          />
-          <div className="EventCalendarOneContent__titleRow__title">{eventCalendar.face.name}</div>
+          <FaceForm current={eventCalendarCurrent.face} onUpdate={onChangeFaceElement} />
+          <div className="EventCalendarOneContent__titleRow__title">{eventCalendarCurrent.face.name}</div>
         </div>
         <div className="EventCalendarOneContent__menu">
-          {eventCalendar.end && (
+          {onStopEvent && (
+            <div
+              className="EventCalendarOneContent__menu-button EventCalendarOneContent__menu__stop"
+              onClick={() => onStopEvent(eventCalendarCurrent)}
+            />
+          )}
+          {onDeleteEvent && eventCalendarCurrent.end && (
             <div
               className="EventCalendarOneContent__menu-button EventCalendarOneContent__menu__delete"
-              onClick={() => onDeleteEvent(eventCalendar)}
+              onClick={() => onDeleteEvent(eventCalendarCurrent)}
             />
           )}
           <div
@@ -49,11 +68,15 @@ export default function EventCalendarOneContent({
         </div>
       </div>
       <div className="EventCalendarOneContent__timeRow xs-top">
-        <span className="EventCalendarOneContent__timeRow__start">{moment(eventCalendar.start).format('LLL')}</span>
-        {eventCalendar.end && (
+        <span className="EventCalendarOneContent__timeRow__start">
+          {moment(eventCalendarCurrent.start).format('LLL')}
+        </span>
+        {eventCalendarCurrent.end && (
           <>
             &nbsp;-&nbsp;
-            <span className="EventCalendarOneContent__timeRow__end">{moment(eventCalendar.end).format('LLL')}</span>
+            <span className="EventCalendarOneContent__timeRow__end">
+              {moment(eventCalendarCurrent.end).format('LLL')}
+            </span>
           </>
         )}
       </div>
@@ -62,10 +85,15 @@ export default function EventCalendarOneContent({
           minRows={3}
           className="EventCalendarOneContent__descriptionRow__textArea"
           placeholder="Description..."
-          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onChangeDescription(e.target.value, eventCalendar)}
+          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onChangeDescription(e.target.value, eventCalendarCurrent)}
           ref={textArea}
         />
       </div>
     </div>
   );
 }
+
+EventCalendarOneContent.defaultProps = {
+  onStopEvent: undefined,
+  onDeleteEvent: undefined,
+};

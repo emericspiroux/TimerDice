@@ -43,7 +43,7 @@ export default function reducer(state: any = {}, action: TEventAction = {}) {
       newState.isUpdateLoading = true;
       return newState;
     case UPDATE_EVENT + SUCCESS_SUFFIX:
-      if (Array.isArray(newState.current) && action.diceFaceTimeElement) {
+      if (Array.isArray(newState.current) && action.diceFaceTimeElement && action.diceFaceTimeElement.end) {
         const index = state.current.findIndex(
           (element: IEventBigCalendar) =>
             // eslint-disable-next-line implicit-arrow-linebreak
@@ -132,7 +132,10 @@ export const getCalendar = (start?: Date, end?: Date, face?: number) => ({
   },
 });
 
-export const patchEvent = (id: string, options: { start?: Date; end?: Date; face?: number; description?: string }) => ({
+export const patchEvent = (
+  id: string,
+  options: { start?: Date; end?: Date; faceId?: number; description?: string },
+) => ({
   type: UPDATE_EVENT,
   payload: {
     request: {

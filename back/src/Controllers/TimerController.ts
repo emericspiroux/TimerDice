@@ -7,7 +7,7 @@ import FormErrorMiddleware from './validations/Errors/FormErrorMiddleware';
 import ControllerError from './Errors/ControllerError';
 import { DiceFaceOrDateValidations } from './validations/Organismes/DiceFaceOrDateValidations';
 import { DiceFaceTimeUpdateBodyValidations } from './validations/Atoms/Body/DiceFaceTimeUpdateValidations';
-import DiceFaceTime, { IDiceFaceTimeUpdateBody } from '../Models/DiceFaceTime';
+import DiceFaceTime, { IDiceFaceTime, IDiceFaceTimeUpdateBody } from '../Models/DiceFaceTime';
 import ModelError from '../Models/Errors/ModelError';
 import DiceFace from '../Models/DiceFace';
 import DiceObject from '../libs/DiceEngine/DiceObject/DiceObject';
@@ -32,6 +32,7 @@ export default class DiceController extends AppController implements IAppControl
 		this.router.get('/', DiceFaceOrDateValidations, FormErrorMiddleware, this.getRange.bind(this));
 		this.router.get('/calendar', DiceFaceOrDateValidations, FormErrorMiddleware, this.getCalendar.bind(this));
 		this.router.get('/current', this.getCurrent.bind(this));
+		this.router.delete('/current', this.stopCurrent.bind(this));
 		this.router.patch(
 			'/:id',
 			idParamsValidation,
@@ -46,7 +47,6 @@ export default class DiceController extends AppController implements IAppControl
 	async onChangeDiceFace(dice: DiceObject) {
 		if (dice.face !== this.previous) {
 			logguer.i('Detect dice motion face :', dice.face);
-			logguer.i('Not same as this.previous :', this.previous);
 			this.previous = dice.face;
 			if (SocketSystem.disabledChange) {
 				logguer.d('Stop setting');
@@ -65,7 +65,7 @@ export default class DiceController extends AppController implements IAppControl
 			}
 			try {
 				const diceFaceTimeStop = await DiceFaceTime.stop();
-				logguer.d('Stopping diceFaceTime :', diceFaceTimeStop);
+				logguer.i('Stopping diceFaceTime :', diceFaceTimeStop.faceId);
 				logguer.d(
 					'Stopping diceFaceTime duration :',
 					diceFaceTimeStop.duration,
@@ -88,7 +88,7 @@ export default class DiceController extends AppController implements IAppControl
 				const diceFaceTimeStart = await DiceFaceTime.start(diceFace);
 				ElectronEngine.shared.onChange(diceFaceTimeStart);
 				SocketServeur.shared.io.emit('dice.start', diceFaceTimeStart);
-				logguer.d('Starting diceFaceTime :', diceFaceTimeStart);
+				logguer.i('Starting diceFaceTime :', diceFaceTimeStart.faceId);
 			}
 		}
 	}
@@ -126,14 +126,33 @@ export default class DiceController extends AppController implements IAppControl
 		}
 	}
 
-	private async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+	private async stopCurrent(_: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			res.send(await DiceFaceTime.updating(req.params['id'], req.body as IDiceFaceTimeUpdateBody));
+			ElectronEngine.shared.onChange();
+			res.send(await DiceFaceTime.stop());
 		} catch (err) {
 			if (err instanceof ModelError) {
 				return next(err);
 			}
 			next(new ControllerError(500, 'unable to get current', err.stack));
+		}
+	}
+
+	private async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const diceFaceTime: IDiceFaceTime = await DiceFaceTime.updating(
+				req.params['id'],
+				req.body as IDiceFaceTimeUpdateBody
+			);
+			res.send(diceFaceTime);
+			if (diceFaceTime.current) {
+				ElectronEngine.shared.onChange(diceFaceTime);
+			}
+		} catch (err) {
+			if (err instanceof ModelError) {
+				return next(err);
+			}
+			next(new ControllerError(500, 'unable to update', err.stack));
 		}
 	}
 

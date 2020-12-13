@@ -1,0 +1,30 @@
+.FaceForm {
+  width: 36px;
+  transition: width 500ms, overflow 500ms 500ms;
+  flex-shrink: 0;
+  display: flex;
+  overflow: hidden;
+  &.FaceForm--open {
+    overflow: visible;
+    width: 289px;
+    animation: 500ms delay-overflow;
+  }
+}
+
+@keyframes delay-overflow {
+  from { overflow: visible!important; }
+}
+
+.FaceForm__element {
+  flex-shrink: 0;
+  $size: 30px;
+  width: $size;
+  height: $size;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+
+.FaceForm__loader {
+  flex-shrink: 0;
+  margin-right: 6px;
+}

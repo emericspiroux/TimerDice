@@ -7,3 +7,11 @@
   color: $grey-darker;
   font-size: 12px;
 }
+
+.StandupSummary__loadingOrEmptyContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 150px);
+  font-weight: 600;
+}

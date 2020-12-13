@@ -5,7 +5,12 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import { useEffect } from 'react';
-import { getCurrentDiceFaceTime, IDiceFaceTime } from '../../Services/Redux/ducks/dice.ducks';
+import {
+  getCurrentDiceFaceTime,
+  IDiceFaceTime,
+  setDice,
+  stopCurrentDiceFaceTime,
+} from '../../Services/Redux/ducks/dice.ducks';
 import DiceTimer from '../Organisms/DiceTimer/DiceTimer';
 import {
   deleteEvent,
@@ -53,6 +58,14 @@ export default function CurrentDicePage() {
     _.get(state, 'calendar.current'),
   );
 
+  const currentDate: { start: Date; end: Date } = useSelector<{ start: Date; end: Date }>((state: any): {
+    start: Date;
+    end: Date;
+  } => ({
+    start: _.get(state, 'calendar.startDate'),
+    end: _.get(state, 'calendar.endDate'),
+  }));
+
   useEffect(() => {
     dispatch(getCurrentDiceFaceTime());
     const startDateOnOpen = new Date();
@@ -93,6 +106,13 @@ export default function CurrentDicePage() {
     }, 1000);
   }
 
+  function onChangeFace(faceId: number, event: IDiceFaceTime) {
+    dispatch(patchEvent(event.id, { faceId }));
+    if (!event.end) {
+      dispatch(setDice({ ...event }));
+    }
+  }
+
   function onDeleteEvent(event: IDiceFaceTime) {
     dispatch(deleteEvent(event.id));
     dispatch(hideModal());
@@ -102,21 +122,31 @@ export default function CurrentDicePage() {
     dispatch(
       showModal(
         <EventCalendarOneContent
+          key={data.resource.id}
           eventCalendar={data.resource}
           onChangeDescription={onChangeDescription}
+          onChangeFace={onChangeFace}
           onDeleteEvent={onDeleteEvent}
         />,
       ),
     );
   }
 
+  function onStopEvent() {
+    dispatch(stopCurrentDiceFaceTime());
+    dispatch(getCalendar(currentDate.start, currentDate.end));
+    dispatch(hideModal());
+  }
+
   function onUpdate(data: IDiceFaceTime) {
     dispatch(
       showModal(
         <EventCalendarOneContent
+          key={data.id}
           eventCalendar={data}
           onChangeDescription={onChangeDescription}
-          onDeleteEvent={onDeleteEvent}
+          onChangeFace={onChangeFace}
+          onStopEvent={onStopEvent}
         />,
       ),
     );
