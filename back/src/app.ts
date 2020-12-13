@@ -10,8 +10,7 @@ import logger from 'basic-log';
 import DiceEngine from './libs/DiceEngine/Engine/DiceEngine';
 import TimerController from './Controllers/TimerController';
 import FaceController from './Controllers/FaceController';
-
-import { app, BrowserWindow } from 'electron';
+import ElectronEngine from './libs/ElectronEngine/ElectronEngine';
 
 // Getting env var
 dotenv.config({
@@ -56,28 +55,6 @@ dotenv.config({
 
 	// Launch electron
 	if (process.env.NODE_ENV !== 'development') {
-		function createWindow() {
-			const win = new BrowserWindow({
-				width: 800,
-				height: 600,
-				webPreferences: {
-					nodeIntegration: true,
-				},
-			});
-			win.loadURL(process.env.FRONT_URI || 'http://localhost:9999');
-		}
-		app.whenReady().then(createWindow);
-
-		app.on('window-all-closed', () => {
-			if (process.platform !== 'darwin') {
-				app.quit();
-			}
-		});
-
-		app.on('activate', () => {
-			if (BrowserWindow.getAllWindows().length === 0) {
-				createWindow();
-			}
-		});
+		ElectronEngine.shared.init();
 	}
 })();

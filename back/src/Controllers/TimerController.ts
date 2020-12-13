@@ -14,6 +14,7 @@ import DiceObject from '../libs/DiceEngine/DiceObject/DiceObject';
 import SocketServeur from '../Serveur/Sockets/SockerServeur';
 import { idParamsValidation } from './validations/Atoms/Params/IdParamsValidations';
 import SocketSystem from '../libs/SocketActions/SocketSystem';
+import ElectronEngine from '../libs/ElectronEngine/ElectronEngine';
 
 export default class DiceController extends AppController implements IAppController {
 	baseRoute: AppRouteDescriptor;
@@ -71,6 +72,7 @@ export default class DiceController extends AppController implements IAppControl
 					Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE || 60000)
 				);
 				SocketServeur.shared.io.emit('dice.stop');
+				ElectronEngine.shared.onChange();
 				if (
 					process.env.TIMETOUT_DURATION_BEFORE_SAVE &&
 					diceFaceTimeStop.duration < Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE || 60000)
@@ -84,6 +86,7 @@ export default class DiceController extends AppController implements IAppControl
 			if (dice.face !== -1) {
 				const diceFace = await DiceFace.getFace(dice.face);
 				const diceFaceTimeStart = await DiceFaceTime.start(diceFace);
+				ElectronEngine.shared.onChange(diceFaceTimeStart);
 				SocketServeur.shared.io.emit('dice.start', diceFaceTimeStart);
 				logguer.d('Starting diceFaceTime :', diceFaceTimeStart);
 			}

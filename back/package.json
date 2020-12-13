@@ -35,7 +35,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf ./build; tsc",
+    "build": "rm -rf ./build; tsc; cp -Rf ./src/public ./build/; cp -Rf ./src/assets ./build/",
     "list": "./node_modules/forever/bin/forever list",
     "start": "nodemon ./src/app.ts",
     "dev": "NODE_ENV=development nodemon ./src/app.ts",
