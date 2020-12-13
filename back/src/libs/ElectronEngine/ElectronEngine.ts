@@ -6,6 +6,7 @@ export default class ElectronEngine {
 	static shared = new ElectronEngine();
 	private contextMenuArray: MenuItemConstructorOptions[];
 	private isInited: boolean;
+	private onStopDice?: () => void;
 	win?: BrowserWindow;
 	tray?: Tray;
 
@@ -35,6 +36,10 @@ export default class ElectronEngine {
 		];
 	}
 
+	setOnStopDice(callback: () => void) {
+		this.onStopDice = callback;
+	}
+
 	private createWindow() {
 		if (!this.win) return;
 		this.win.loadURL(process.env.FRONT_URI || 'http://localhost:9999');
@@ -53,12 +58,22 @@ export default class ElectronEngine {
 
 	onChange(dice?: IDiceFaceTime) {
 		if (!this.isInited || !this.tray) return;
+		const labelStop = "Stopper l'activité";
 		if (!dice) {
 			console.log('Change dice no dice');
 			this.contextMenuArray[0].label = 'Aucune activité en cours';
+			if (this.contextMenuArray[1].label === labelStop) {
+				this.contextMenuArray.splice(1, 1);
+			}
 		} else {
 			console.log('Change to current dice :', dice);
 			this.contextMenuArray[0].label = `En cours : ${dice.face.name}`;
+			if (this.onStopDice) {
+				this.contextMenuArray.splice(1, 0, {
+					label: labelStop,
+					click: this.onStopDice,
+				});
+			}
 		}
 		this.tray.setContextMenu(Menu.buildFromTemplate(this.contextMenuArray));
 	}

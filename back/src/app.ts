@@ -11,6 +11,8 @@ import DiceEngine from './libs/DiceEngine/Engine/DiceEngine';
 import TimerController from './Controllers/TimerController';
 import FaceController from './Controllers/FaceController';
 import ElectronEngine from './libs/ElectronEngine/ElectronEngine';
+import DiceFaceTime from './Models/DiceFaceTime';
+import SocketSystem from './libs/SocketActions/SocketSystem';
 
 // Getting env var
 dotenv.config({
@@ -56,5 +58,10 @@ dotenv.config({
 	// Launch electron
 	if (process.env.NODE_ENV !== 'development') {
 		ElectronEngine.shared.init();
+		ElectronEngine.shared.setOnStopDice(async () => {
+			await DiceFaceTime.stop();
+			ElectronEngine.shared.onChange();
+			SocketSystem.fireStopCurrentDice();
+		});
 	}
 })();

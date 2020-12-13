@@ -52,7 +52,7 @@ export default class DiceController extends AppController implements IAppControl
 				logguer.d('Stop setting');
 				logguer.d('Setting dice face :', dice.face);
 				await DiceFace.stopCurrentSettings();
-				SocketServeur.shared.io.emit('dice.setting');
+				SocketSystem.fireSettingDice();
 				if (dice.face !== -1) {
 					try {
 						const diceFace = await DiceFace.setCurrentSettings(dice.face);
@@ -71,7 +71,7 @@ export default class DiceController extends AppController implements IAppControl
 					diceFaceTimeStop.duration,
 					Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE || 60000)
 				);
-				SocketServeur.shared.io.emit('dice.stop');
+				SocketSystem.fireStopCurrentDice();
 				ElectronEngine.shared.onChange();
 				if (
 					process.env.TIMETOUT_DURATION_BEFORE_SAVE &&
@@ -87,7 +87,7 @@ export default class DiceController extends AppController implements IAppControl
 				const diceFace = await DiceFace.getFace(dice.face);
 				const diceFaceTimeStart = await DiceFaceTime.start(diceFace);
 				ElectronEngine.shared.onChange(diceFaceTimeStart);
-				SocketServeur.shared.io.emit('dice.start', diceFaceTimeStart);
+				SocketSystem.fireStartCurrentDice(diceFaceTimeStart);
 				logguer.i('Starting diceFaceTime :', diceFaceTimeStart.faceId);
 			}
 		}
@@ -129,6 +129,7 @@ export default class DiceController extends AppController implements IAppControl
 	private async stopCurrent(_: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			ElectronEngine.shared.onChange();
+			SocketSystem.fireStopCurrentDice();
 			res.send(await DiceFaceTime.stop());
 		} catch (err) {
 			if (err instanceof ModelError) {

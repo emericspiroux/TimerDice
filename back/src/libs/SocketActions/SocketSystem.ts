@@ -1,5 +1,6 @@
 import logguer from 'basic-log';
 import { IDiceFace } from '../../Models/DiceFace';
+import { IDiceFaceTime } from '../../Models/DiceFaceTime';
 import SocketServeur from '../../Serveur/Sockets/SockerServeur';
 
 export default class SocketSystem {
@@ -33,12 +34,20 @@ export default class SocketSystem {
 		SocketServeur.shared.io.emit('dice.setting.detect');
 	}
 
-	static fireSettingDice(dice: IDiceFace) {
+	static fireSettingDice(dice?: IDiceFace) {
 		SocketServeur.shared.io.emit('dice.setting', dice);
 	}
 
 	static fireCheckUpdate() {
 		logguer.d('SocketAlarm -> fireCheckUpdate');
 		SocketServeur.shared.io.emit('checkUpdate');
+	}
+
+	static fireStopCurrentDice() {
+		SocketServeur.shared.io.emit('dice.stop');
+	}
+
+	static fireStartCurrentDice(current: IDiceFaceTime) {
+		SocketServeur.shared.io.emit('dice.start', current);
 	}
 }
