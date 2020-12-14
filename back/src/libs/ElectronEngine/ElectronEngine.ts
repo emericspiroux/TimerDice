@@ -31,6 +31,9 @@ export default class ElectronEngine {
 				},
 			},
 			{
+				type: 'separator',
+			},
+			{
 				label: 'Fermer Timer Dice',
 				click: () => {
 					process.exit(0);
