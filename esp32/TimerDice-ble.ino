@@ -103,26 +103,6 @@ void setup() {
   pAdvertising->setMinPreferred(0x0);  // set value to 0x00 to not advertise this parameter
   BLEDevice::startAdvertising();
   Serial.println("Waiting a client connection to notify...");
-//  delay(1500);
-//  while(!deviceConnected) {
-//    Serial.println("Going to deepsleep");
-//    esp_sleep_enable_timer_wakeup(5000);
-//    return esp_deep_sleep_start();
-//  }
-//
-//  Serial.println("Device connected ! Sent !");
-//  mpu.getRotation(&GyX, &GyY, &GyZ);
-//  Serial.println("\n\nGyroscope Values:");
-//  String strValue = String(GyX) + ":" + String(GyY) + ":" + String(GyZ);
-//  Serial.println(strValue);
-//  pCharacteristic->setValue(strValue.c_str());
-//  pCharacteristic->notify();
-//  Serial.println("Waiting for message send");
-//  delay(1500);
-//  pinMode(LED_BUILTIN, OUTPUT);
-//  digitalWrite(LED_BUILTIN, LOW);
-//  Serial.println("Going to deepsleep after notify");
-
 }
 
 int minVal=265;

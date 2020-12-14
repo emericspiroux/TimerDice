@@ -1,6 +1,6 @@
 {
   "name": "timer-dice",
-  "version": "1.4.7",
+  "version": "0.0.0",
   "description": "",
   "main": "build/src/app.js",
   "config": {
