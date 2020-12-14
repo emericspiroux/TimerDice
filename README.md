@@ -7,7 +7,7 @@ Timerdice is a timetracker dice like [Timeular](https://timeular.com/) do, but i
 
 Current supported platform : macOS 10.15.7
 
-### Print your Dice and connect wire
+### Print your Dice and connect wires
 
 `STL files` will come sooner as possible (Not really finished yet 😅), contact me if you want Fusion360 files or current STL files.
 
