@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Tray, Menu } from 'electron';
 import { Event, MenuItemConstructorOptions } from 'electron/main';
-import { fstat } from 'fs';
+import logguer from 'basic-log';
 import { IDiceFaceTime } from '../../Models/DiceFaceTime';
 import fs from 'fs';
 import Path from 'path';
@@ -57,12 +57,15 @@ export default class ElectronEngine {
 	}
 
 	static get dbPath(): string {
+		let pathDB;
 		if (process.env.NODE_ENV === 'development') {
-			return `${__dirname}/../../../mongodb/db`;
+			pathDB = `${__dirname}/../../../mongodb/db`;
+		} else {
+			const appDataPath = app.getPath('appData');
+			pathDB = Path.resolve(appDataPath, './TimerDiceDB');
+			if (!fs.existsSync(pathDB)) fs.mkdirSync(pathDB);
 		}
-		const appDataPath = app.getPath('appData');
-		const pathDB = Path.resolve(appDataPath, './db');
-		if (!fs.existsSync(pathDB)) fs.mkdirSync(pathDB);
+		logguer.i('Launching mongd with dbpath :', pathDB);
 		return pathDB;
 	}
 
