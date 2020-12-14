@@ -34,9 +34,12 @@ dotenv.config({
 	// Creating server
 	let serveur = new Serveur({
 		mongo: {
-			uri: process.env.MONGO_URI || 'mongodb://localhost/DiceTimer',
+			uri: process.env.MONGO_URI || 'mongodb://localhost:27020/DiceTimer',
 		},
 	});
+
+	// Start listenning
+	await serveur.start(Number(process.env.PORT || 9999));
 
 	// Add controllers
 	const faceController = new FaceController();
@@ -45,9 +48,6 @@ dotenv.config({
 	serveur.router.addController(faceController);
 	serveur.router.addController(timerController);
 	serveur.router.addController(new SocketController());
-
-	// Start listenning
-	serveur.start(Number(process.env.PORT || 9999));
 
 	// Init dices faces
 	await faceController.initFaceDefault();

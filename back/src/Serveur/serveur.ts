@@ -4,6 +4,7 @@ import util from 'util';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import Mongoose from 'mongoose';
 import logguer from 'basic-log';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 
 import Router from './Router';
 import IServeurConfig from './Types/IServeurConfig.type';
@@ -21,6 +22,7 @@ export default class Serveur {
 	public router: Router;
 	private configPrv: IServeurConfig;
 	private socketServeur: SocketServeur = SocketServeur.shared;
+	private mongoChildProcess: ChildProcessWithoutNullStreams;
 
 	constructor(config: IServeurConfig) {
 		this.configPrv = config;
@@ -75,6 +77,38 @@ export default class Serveur {
 		});
 	}
 
+	private startMongoDB(): Promise<void> {
+		return new Promise((s, f) => {
+			this.mongoChildProcess = spawn(`${__dirname}/../../mongodb/mongod`, [
+				`--dbpath=${__dirname}/../../mongodb/db`,
+				'--port',
+				'27020',
+			]);
+			this.mongoChildProcess.stdout.on('data', (data) => {
+				logguer.d(data.toString('utf8'));
+				const dataArray = data.toString('utf8').split('\n');
+				for (const dataLine of dataArray) {
+					try {
+						const dataJSON = JSON.parse(dataLine);
+						if (dataJSON.ctx === 'listener' && dataJSON.msg === 'Waiting for connections') {
+							s();
+						}
+					} catch (err) {
+						logguer.d('Error on parsing data', err);
+						logguer.d(data.toString('utf8'));
+					}
+				}
+			});
+			this.mongoChildProcess.stderr.on('data', (data) => {
+				logguer.e(data.toString('utf8'));
+				f();
+			});
+			this.mongoChildProcess.on('close', (code) => {
+				logguer.e('Process exited with code: ' + code);
+			});
+		});
+	}
+
 	private async connectDB(config: IServeurMongoConfig) {
 		try {
 			logguer.d(`Connecting MongoDB: ${config.uri}`);
@@ -93,17 +127,32 @@ export default class Serveur {
 
 	private async initCheckUpdate() {}
 
-	async start(port: number) {
-		this.port = port;
-		if (this.configPrv.mongo) {
-			await this.connectDB(this.configPrv.mongo);
-		}
-		this.initEndPointLog();
-		this.initRoutes();
-		this.initErrorRoute();
-		let http = this.app.listen(this.port, () => {
-			logguer.i(`Server started at http://localhost:${this.port}`);
+	async start(port: number): Promise<void> {
+		return new Promise(async (s) => {
+			process.on('uncaughtException', function (err) {
+				logguer.e('Caught exception: ' + err);
+				if (this.mongoChildProcess) this.mongoChildProcess.kill('SIGINT');
+				process.exit();
+			});
+
+			process.on('exit', function (code) {
+				if (this.mongoChildProcess) this.mongoChildProcess.kill('SIGINT');
+				logguer.i('Kill signal received:', code);
+			});
+
+			this.port = port;
+			if (this.configPrv.mongo) {
+				await this.startMongoDB();
+				await this.connectDB(this.configPrv.mongo);
+			}
+			this.initEndPointLog();
+			this.initRoutes();
+			this.initErrorRoute();
+			let http = this.app.listen(this.port, () => {
+				logguer.i(`Server started at http://localhost:${this.port}`);
+				s();
+			});
+			this.socketServeur.start(http);
 		});
-		this.socketServeur.start(http);
 	}
 }
