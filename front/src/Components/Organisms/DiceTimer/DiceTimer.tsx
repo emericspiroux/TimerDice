@@ -18,7 +18,7 @@ export default function DiceTimer({
   const sinceDate = useSinceDate(current?.start);
   return (
     <div className="DiceTimer">
-      <DonutTimer backgroundColor="#0000000a" startDate={current?.start} color={current?.face.color}>
+      <DonutTimer backgroundColor="#0000000a" startDate={current?.start} color={current?.face?.color}>
         {current ? (
           <div className="DiceTimer__content">
             <div className="DiceTimer__content__timer" style={{ color: current?.face.color }}>

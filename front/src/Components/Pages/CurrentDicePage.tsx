@@ -122,7 +122,7 @@ export default function CurrentDicePage() {
     dispatch(
       showModal(
         <EventCalendarOneContent
-          key={data.resource.id}
+          key={`${data.resource.id}_${data.end}`}
           eventCalendar={data.resource}
           onChangeDescription={onChangeDescription}
           onChangeFace={onChangeFace}
@@ -142,7 +142,7 @@ export default function CurrentDicePage() {
     dispatch(
       showModal(
         <EventCalendarOneContent
-          key={data.id}
+          key={`${data.id}_${data.end}`}
           eventCalendar={data}
           onChangeDescription={onChangeDescription}
           onChangeFace={onChangeFace}

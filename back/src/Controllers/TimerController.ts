@@ -117,7 +117,10 @@ export default class DiceController extends AppController implements IAppControl
 
 	private async getCurrent(_: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			res.send(await DiceFaceTime.getCurrent());
+			console.log('Get current');
+			const current = await DiceFaceTime.getCurrent();
+			console.log('🚀 ~ file: TimerController.ts ~ line 121 ~ DiceController ~ getCurrent ~ current', current);
+			res.send(current);
 		} catch (err) {
 			if (err instanceof ModelError) {
 				return next(err);

@@ -106,7 +106,7 @@ export default function CalendarPage() {
     dispatch(
       showModal(
         <EventCalendarOneContent
-          key={data.resource.id}
+          key={`${data.resource.id}_${data.end}`}
           eventCalendar={data.resource}
           onChangeDescription={onChangeDescription}
           onChangeFace={onChangeFace}

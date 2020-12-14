@@ -16,6 +16,7 @@ import ControllerError from '../Controllers/Errors/ControllerError';
 import SocketServeur from './Sockets/SockerServeur';
 
 import ModelError from '../Models/Errors/ModelError';
+import ElectronEngine from '../libs/ElectronEngine/ElectronEngine';
 
 export default class Serveur {
 	public app: Express = express();
@@ -85,14 +86,7 @@ export default class Serveur {
 					__dirname,
 					process.env.NODE_ENV === 'development' ? '../../mongodb/mongod' : '../../../mongodb/mongod'
 				),
-				[
-					`--dbpath=${path.resolve(
-						__dirname,
-						process.env.NODE_ENV === 'development' ? '../../mongodb/db' : '../../../mongodb/db'
-					)}`,
-					'--port',
-					'27020',
-				]
+				[`--dbpath=${ElectronEngine.dbPath}`, '--port', '27020']
 			);
 			this.mongoChildProcess.stdout.on('data', (data) => {
 				logguer.d(data.toString('utf8'));
@@ -103,9 +97,8 @@ export default class Serveur {
 						if (dataJSON.ctx === 'listener' && dataJSON.msg === 'Waiting for connections') {
 							s();
 						}
-					} catch (err) {
-						logguer.d('Error on parsing data', err);
-						logguer.d(data.toString('utf8'));
+					} catch {
+						/* */
 					}
 				}
 			});
@@ -115,6 +108,22 @@ export default class Serveur {
 			});
 			this.mongoChildProcess.on('close', (code) => {
 				logguer.e('Process exited with code: ' + code);
+			});
+			process.on('uncaughtException', function (err) {
+				logguer.e('Caught exception: ' + err);
+				if (this.mongoChildProcess) {
+					this.mongoChildProcess.kill();
+					logguer.i('Kill mongodb process');
+				}
+				process.exit(0);
+			});
+
+			process.on('exit', function (code) {
+				if (this.mongoChildProcess) {
+					logguer.i('Kill mongodb process');
+					this.mongoChildProcess.kill();
+				}
+				logguer.i('Kill signal received:', code);
 			});
 		});
 	}
@@ -139,20 +148,11 @@ export default class Serveur {
 
 	async start(port: number): Promise<void> {
 		return new Promise(async (s) => {
-			process.on('uncaughtException', function (err) {
-				logguer.e('Caught exception: ' + err);
-				if (this.mongoChildProcess) this.mongoChildProcess.kill('SIGINT');
-				process.exit();
-			});
-
-			process.on('exit', function (code) {
-				if (this.mongoChildProcess) this.mongoChildProcess.kill('SIGINT');
-				logguer.i('Kill signal received:', code);
-			});
-
 			this.port = port;
 			if (this.configPrv.mongo) {
-				await this.startMongoDB();
+				if (process.env.NODE_ENV !== 'development') {
+					await this.startMongoDB();
+				}
 				await this.connectDB(this.configPrv.mongo);
 			}
 			this.initEndPointLog();

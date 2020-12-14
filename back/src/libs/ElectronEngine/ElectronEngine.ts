@@ -1,6 +1,9 @@
 import { app, BrowserWindow, Tray, Menu } from 'electron';
 import { Event, MenuItemConstructorOptions } from 'electron/main';
+import { fstat } from 'fs';
 import { IDiceFaceTime } from '../../Models/DiceFaceTime';
+import fs from 'fs';
+import Path from 'path';
 
 export default class ElectronEngine {
 	static shared = new ElectronEngine();
@@ -48,6 +51,16 @@ export default class ElectronEngine {
 			app.dock.hide();
 			this.win.hide();
 		});
+	}
+
+	static get dbPath(): string {
+		if (process.env.NODE_ENV === 'development') {
+			return `${__dirname}/../../../mongodb/db`;
+		}
+		const appDataPath = app.getPath('appData');
+		const pathDB = Path.resolve(appDataPath, './db');
+		if (!fs.existsSync(pathDB)) fs.mkdirSync(pathDB);
+		return pathDB;
 	}
 
 	private createTray() {
