@@ -13,7 +13,8 @@
   "author": "Emeric SPIROUX",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^12.0.0-beta.9"
+    "electron": "^12.0.0-beta.9",
+    "getopts": "^2.2.5"
   },
   "dependencies": {
     "@abandonware/noble": "^1.9.2-10",
