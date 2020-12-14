@@ -9,9 +9,9 @@ Current supported platform : macOS 10.15.7
 
 ### Print your Dice and connect wire
 
-Print STL file will come sooner as possible (Not really yet finished), contact me if you want Fusion360 files or current STL files.
+`STL files` will come sooner as possible (Not really finished yet 😅), contact me if you want Fusion360 files or current STL files.
 
-Will your dice is printed you will need :
+When your dice is printed you will need :
 
 - 1x ESP32 WEMOS Mini D1
 - 1x Batterie shield
@@ -19,7 +19,7 @@ Will your dice is printed you will need :
 - 1x MPU6050
 - Wires !
 
-Connection Schema available soon but :
+Connection Schema available soon as possible but meanwhile :
 
 - MPU6050 -> ESP32
   - INT -> IO4
