@@ -5,6 +5,7 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import Mongoose from 'mongoose';
 import logguer from 'basic-log';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import path from 'path';
 
 import Router from './Router';
 import IServeurConfig from './Types/IServeurConfig.type';
@@ -79,11 +80,20 @@ export default class Serveur {
 
 	private startMongoDB(): Promise<void> {
 		return new Promise((s, f) => {
-			this.mongoChildProcess = spawn(`${__dirname}/../../mongodb/mongod`, [
-				`--dbpath=${__dirname}/../../mongodb/db`,
-				'--port',
-				'27020',
-			]);
+			this.mongoChildProcess = spawn(
+				path.resolve(
+					__dirname,
+					process.env.NODE_ENV === 'development' ? '../../mongodb/mongod' : '../../../mongodb/mongod'
+				),
+				[
+					`--dbpath=${path.resolve(
+						__dirname,
+						process.env.NODE_ENV === 'development' ? '../../mongodb/db' : '../../../mongodb/db'
+					)}`,
+					'--port',
+					'27020',
+				]
+			);
 			this.mongoChildProcess.stdout.on('data', (data) => {
 				logguer.d(data.toString('utf8'));
 				const dataArray = data.toString('utf8').split('\n');
