@@ -128,6 +128,13 @@ export default class Serveur {
 		});
 	}
 
+	stopMongo() {
+		if (this.mongoChildProcess) {
+			this.mongoChildProcess.kill();
+			logguer.i('Kill mongodb process');
+		}
+	}
+
 	private async connectDB(config: IServeurMongoConfig) {
 		try {
 			logguer.d(`Connecting MongoDB: ${config.uri}`);

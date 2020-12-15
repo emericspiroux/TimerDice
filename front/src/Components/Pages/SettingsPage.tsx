@@ -99,7 +99,7 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div className="Settings__emptyWrapper__text">
-            Met le dé dans la position que tu souhaite paramètrer pour commencer
+            Place le dé dans la position que tu souhaites paramètrer pour commencer
           </div>
         </div>
       )}

@@ -10,6 +10,7 @@ export default class ElectronEngine {
 	private contextMenuArray: MenuItemConstructorOptions[];
 	private isInited: boolean;
 	private onStopDice?: () => void;
+	private onCloseAction: () => void;
 	win?: BrowserWindow;
 	tray?: Tray;
 
@@ -36,6 +37,9 @@ export default class ElectronEngine {
 			{
 				label: 'Fermer Timer Dice',
 				click: () => {
+					if (this.onCloseAction) {
+						this.onCloseAction();
+					}
 					process.exit(0);
 				},
 			},
@@ -95,6 +99,10 @@ export default class ElectronEngine {
 			}
 		}
 		this.tray.setContextMenu(Menu.buildFromTemplate(this.contextMenuArray));
+	}
+
+	onClose(onCloseAction: () => void) {
+		this.onCloseAction = onCloseAction;
 	}
 
 	init() {

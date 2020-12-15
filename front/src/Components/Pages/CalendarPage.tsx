@@ -150,7 +150,7 @@ export default function CalendarPage() {
                 totalDuration={DurationTotalCount(rangeEvents)}
               />
             ) : (
-              <div>Aucune activité enregistré cette semaine.</div>
+              <div>Aucune activité enregistrée cette semaine.</div>
             )}
           </div>
           <div className="CalendarPage__calendar">

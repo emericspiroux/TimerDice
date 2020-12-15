@@ -57,11 +57,14 @@ dotenv.config({
 
 	// Launch electron
 	if (process.env.NODE_ENV !== 'development') {
-		ElectronEngine.shared.init();
+		ElectronEngine.shared.onClose(() => {
+			serveur.stopMongo();
+		});
 		ElectronEngine.shared.setOnStopDice(async () => {
 			await DiceFaceTime.stop();
 			ElectronEngine.shared.onChange();
 			SocketSystem.fireStopCurrentDice();
 		});
+		ElectronEngine.shared.init();
 	}
 })();
