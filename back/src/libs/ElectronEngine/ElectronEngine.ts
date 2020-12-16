@@ -11,6 +11,7 @@ export default class ElectronEngine {
 	private isInited: boolean;
 	private onStopDice?: () => void;
 	private onCloseAction: () => void;
+	private isStopAlreadyExist = false;
 	win?: BrowserWindow;
 	tray?: Tray;
 
@@ -83,15 +84,16 @@ export default class ElectronEngine {
 		if (!this.isInited || !this.tray) return;
 		const labelStop = "Stopper l'activité";
 		if (!dice) {
-			console.log('Change dice no dice');
 			this.contextMenuArray[0].label = 'Aucune activité en cours';
-			if (this.contextMenuArray[1].label === labelStop) {
-				this.contextMenuArray.splice(1, 1);
+			const stopIndex = this.contextMenuArray.findIndex((e) => e.label === labelStop);
+			if (stopIndex !== -1) {
+				this.contextMenuArray.splice(stopIndex, 1);
+				this.isStopAlreadyExist = false;
 			}
 		} else {
-			console.log('Change to current dice :', dice);
 			this.contextMenuArray[0].label = `En cours : ${dice.face.name}`;
 			if (this.onStopDice) {
+				this.isStopAlreadyExist = true;
 				this.contextMenuArray.splice(1, 0, {
 					label: labelStop,
 					click: this.onStopDice,
