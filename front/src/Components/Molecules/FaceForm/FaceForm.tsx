@@ -34,7 +34,7 @@ export default function FaceForm({ current, onUpdate }: { current: IDiceFace; on
       {isLoadingFaces ? (
         <Loader size="22px" className="FaceForm__loader" />
       ) : (
-        <div style={{ backgroundColor: currentFace.color }} className="FaceForm__element" onClick={onClickOpen} />
+        <div style={{ backgroundColor: currentFace?.color }} className="FaceForm__element" onClick={onClickOpen} />
       )}
       {Array.isArray(currentDiceFaces) &&
         currentDiceFaces

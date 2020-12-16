@@ -46,7 +46,7 @@ export default function EventCalendarOneContent({
       <div className="EventCalendarOneContent__top">
         <div className="EventCalendarOneContent__titleRow">
           <FaceForm current={eventCalendarCurrent.face} onUpdate={onChangeFaceElement} />
-          <div className="EventCalendarOneContent__titleRow__title">{eventCalendarCurrent.face.name}</div>
+          <div className="EventCalendarOneContent__titleRow__title">{eventCalendarCurrent.face?.name || 'Unknown'}</div>
         </div>
         <div className="EventCalendarOneContent__menu">
           {onStopEvent && (

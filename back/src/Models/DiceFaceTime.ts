@@ -161,10 +161,6 @@ DiceFaceTimeSchema.statics.updating = async function (id: string, body: IDiceFac
 	let element = await this.findById(id);
 	if (!element) throw new NoCurrentDiceError(name);
 
-	if (body.start && body.end && new Date(body.end) <= new Date(body.start)) {
-		throw new WrongStartEndDiceError(name);
-	}
-
 	if (body.start) {
 		element.start = new Date(body.start);
 	}
