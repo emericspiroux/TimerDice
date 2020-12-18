@@ -92,7 +92,7 @@ export default class ElectronEngine {
 			}
 		} else {
 			this.contextMenuArray[0].label = `En cours : ${dice.face.name}`;
-			if (this.onStopDice) {
+			if (this.onStopDice && !this.isStopAlreadyExist) {
 				this.isStopAlreadyExist = true;
 				this.contextMenuArray.splice(1, 0, {
 					label: labelStop,
