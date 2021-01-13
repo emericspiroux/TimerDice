@@ -113,6 +113,7 @@ export default function UpdateFaceForm({
         type="text"
         onChange={(event) => setName(event.target.value)}
         defaultValue={face.name}
+        placeholder="Nom de la face..."
         style={{ color }}
         className="UpdateFaceForm__input s-bottom xl-top"
       />
@@ -137,13 +138,14 @@ export default function UpdateFaceForm({
               <div className="UpdateFaceForm__slack__closeEmoji" />
             </div>
           )}
-          <Emoji emoji={slackEmoji} size={40} />
+          <Emoji emoji={slackEmoji || ':question:'} size={40} />
         </div>
         <input
           type="text"
           onChange={(event) => setSlackText(event.target.value)}
           defaultValue={face.slackStatus?.text || ''}
           style={{ color }}
+          placeholder="Slack status..."
           maxLength={100}
           className="UpdateFaceForm__input UpdateFaceForm__input-slack"
         />
