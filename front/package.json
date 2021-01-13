@@ -1,6 +1,6 @@
 {
   "name": "timer-dice-front",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "build": "react-scripts build && cp -Rf ./build/ ../back/src/public",
