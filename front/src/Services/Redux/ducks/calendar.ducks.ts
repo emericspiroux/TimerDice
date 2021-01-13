@@ -53,7 +53,6 @@ export default function reducer(state: any = {}, action: TEventAction = {}) {
         if (index === -1) return newState;
 
         const diceFaceTime = action.diceFaceTimeElement;
-        console.log('🚀 ~ file: calendar.ducks.ts ~ line 56 ~ reducer ~ diceFaceTime', diceFaceTime);
         newState.current[index] = {
           title: diceFaceTime.face.name,
           start: diceFaceTime.start,

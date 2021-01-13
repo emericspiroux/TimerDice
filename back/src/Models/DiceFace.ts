@@ -7,6 +7,10 @@ const DiceFaceSchema = new Schema({
 	faceId: Number,
 	name: String,
 	color: String,
+	slackStatus: {
+		text: String,
+		emoji: String,
+	},
 	createdAt: Date,
 	updatedAt: Date,
 });
@@ -14,6 +18,10 @@ const DiceFaceSchema = new Schema({
 export interface IDiceFaceUpdateBody {
 	name?: string;
 	color?: string;
+	slackStatus?: {
+		text?: String;
+		emoji?: String;
+	};
 }
 
 export interface IDiceFace extends Document {
@@ -23,6 +31,10 @@ export interface IDiceFace extends Document {
 	faceId: number;
 	name: string;
 	color: string;
+	slackStatus?: {
+		text?: String;
+		emoji?: String;
+	};
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -35,7 +47,16 @@ export interface IDiceFaceModel extends Model<IDiceFace> {
 	getCurrentSettings(): Promise<IDiceFace | undefined>;
 	setCurrentSettings(face: number): Promise<IDiceFace>;
 	stopCurrentSettings(): Promise<void>;
-	define(enabled: boolean, faceId: number, name: string, color: string): Promise<IDiceFace>;
+	define(
+		enabled: boolean,
+		faceId: number,
+		name: string,
+		color: string,
+		slackStatus?: {
+			text?: String;
+			emoji?: String;
+		}
+	): Promise<IDiceFace>;
 	deleting(faceId: number);
 	toJSON(): IDiceFace;
 }
@@ -54,7 +75,11 @@ DiceFaceSchema.statics.define = async function (
 	enabled: boolean,
 	faceId: number,
 	name: string,
-	color: string
+	color: string,
+	slackStatus?: {
+		text?: String;
+		emoji?: String;
+	}
 ): Promise<IDiceFace> {
 	let element: IDiceFace = await this.findOne({ faceId });
 	if (!element)
@@ -62,6 +87,7 @@ DiceFaceSchema.statics.define = async function (
 			createdAt: new Date(),
 		});
 
+	element.slackStatus = slackStatus;
 	element.enabled = enabled;
 	element.faceId = faceId;
 	element.name = name;
@@ -95,6 +121,18 @@ DiceFaceSchema.statics.updating = async function (id: string, body: IDiceFaceUpd
 
 	if (body.color) {
 		element.color = body.color;
+	}
+
+	if (!element.slackStatus && body.slackStatus) {
+		element.slackStatus = {};
+	}
+
+	if (body.slackStatus && body.slackStatus.emoji) {
+		element.slackStatus.emoji = body.slackStatus.emoji;
+	}
+
+	if (body.slackStatus && body.slackStatus.text) {
+		element.slackStatus.text = body.slackStatus.text;
 	}
 
 	return await element.save();

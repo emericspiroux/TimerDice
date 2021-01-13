@@ -15,10 +15,12 @@ import SocketServeur from '../Serveur/Sockets/SockerServeur';
 import { idParamsValidation } from './validations/Atoms/Params/IdParamsValidations';
 import SocketSystem from '../libs/SocketActions/SocketSystem';
 import ElectronEngine from '../libs/ElectronEngine/ElectronEngine';
+import WebhookEngine from '../libs/WebhookEngine/WebhookEngine';
 
 export default class DiceController extends AppController implements IAppController {
 	baseRoute: AppRouteDescriptor;
 	private previous = -1;
+	private webhookEngine = new WebhookEngine();
 
 	constructor() {
 		super();
@@ -72,6 +74,7 @@ export default class DiceController extends AppController implements IAppControl
 					Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE || 60000)
 				);
 				SocketSystem.fireStopCurrentDice();
+				WebhookEngine.shared.clean();
 				ElectronEngine.shared.onChange();
 				if (
 					process.env.TIMETOUT_DURATION_BEFORE_SAVE &&
@@ -88,6 +91,7 @@ export default class DiceController extends AppController implements IAppControl
 				const diceFaceTimeStart = await DiceFaceTime.start(diceFace);
 				ElectronEngine.shared.onChange(diceFaceTimeStart);
 				SocketSystem.fireStartCurrentDice(diceFaceTimeStart);
+				WebhookEngine.shared.execute(diceFaceTimeStart);
 				logguer.i('Starting diceFaceTime :', diceFaceTimeStart.faceId);
 			}
 		}

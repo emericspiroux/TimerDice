@@ -1,9 +1,13 @@
 import { FormEvent, useState } from 'react';
 import { BlockPicker } from 'react-color';
+import { Picker, Emoji } from 'emoji-mart';
+
 import { IDiceFace } from '../../../Services/Redux/ducks/dice.ducks';
+import 'emoji-mart/css/emoji-mart.css';
 import Loader from '../../Atoms/Loader';
 
 import './UpdateFaceForm.scss';
+import EmojiMartObject from '../../../Types/emoji-mart.types';
 
 export default function UpdateFaceForm({
   face,
@@ -18,12 +22,18 @@ export default function UpdateFaceForm({
 }) {
   const [name, setName] = useState(face.name);
   const [color, setColor] = useState(face.color);
+  const [slackText, setSlackText] = useState(face.slackStatus?.text);
+  const [slackEmoji, setSlackEmoji] = useState(face.slackStatus?.emoji);
+  const [isDisplayEmojiPicker, setIsDisplayEmojiPicker] = useState(false);
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const faceUpdated = { ...face };
     faceUpdated.name = name;
     faceUpdated.color = color;
+    faceUpdated.slackStatus = face.slackStatus || {};
+    faceUpdated.slackStatus.text = slackText;
+    faceUpdated.slackStatus.emoji = slackEmoji;
     onChange(faceUpdated);
   }
 
@@ -104,13 +114,45 @@ export default function UpdateFaceForm({
         onChange={(event) => setName(event.target.value)}
         defaultValue={face.name}
         style={{ color }}
-        className="UpdateFaceForm__input xl-bottom xl-top"
+        className="UpdateFaceForm__input s-bottom xl-top"
       />
+      <div className="UpdateFaceForm__slack xl-bottom xl-top">
+        <div
+          className="UpdateFaceForm__slack__emoji"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsDisplayEmojiPicker(true);
+          }}
+        >
+          {isDisplayEmojiPicker && (
+            <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', bottom: '20px', right: '20px' }}>
+              <Picker
+                set="apple"
+                onSelect={(emoji: EmojiMartObject) => {
+                  setSlackEmoji(emoji.colons);
+                  setIsDisplayEmojiPicker(false);
+                }}
+                i18n={{ search: 'Recherche', categories: { search: 'Résultats de recherche', recent: 'Récents' } }}
+              />
+              <div className="UpdateFaceForm__slack__closeEmoji" />
+            </div>
+          )}
+          <Emoji emoji={slackEmoji} size={40} />
+        </div>
+        <input
+          type="text"
+          onChange={(event) => setSlackText(event.target.value)}
+          defaultValue={face.slackStatus?.text || ''}
+          style={{ color }}
+          maxLength={100}
+          className="UpdateFaceForm__input UpdateFaceForm__input-slack"
+        />
+      </div>
       <div className="UpdateFaceForm__button">
         {isLoading ? (
           <Loader size="40px" />
         ) : (
-          <button type="submit" className="UpdateFaceForm__button button-blue" disabled={!name}>
+          <button type="submit" className="button UpdateFaceForm__button button-blue" disabled={!name}>
             Enregistrer
           </button>
         )}

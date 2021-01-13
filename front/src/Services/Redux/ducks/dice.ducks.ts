@@ -21,8 +21,22 @@ export interface IDiceFace {
   faceId: number;
   name: string;
   color: string;
+  slackStatus?: {
+    text?: string;
+    emoji?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IDiceFaceUpdate {
+  enabled?: boolean;
+  name?: string;
+  color?: string;
+  slackStatus?: {
+    text?: string;
+    emoji?: string;
+  };
 }
 
 export interface IDiceFaceTime {

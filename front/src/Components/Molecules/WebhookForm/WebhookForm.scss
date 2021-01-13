@@ -1,0 +1,39 @@
+@import '../../Styles/color.scss';
+
+.WebhookForm_input {
+  flex-grow: 1;
+  width: 100%;
+  resize: none;
+  border: none;
+  font-size: 16px;
+  &:focus {
+    outline: none;
+  }
+}
+
+.WebhookForm {
+  form {
+    width: 100%;
+    display: flex;
+    width: 100%;
+    align-items: center;
+  }
+}
+
+.WebhookForm__loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 121.05px;
+}
+
+.WebhookForm_error {
+  color: $red;
+  background-color: $red-light;
+  padding: 16px;
+  border-radius: 20px;
+}
+
+.WebhookForm__button {
+  height: 30px;
+}

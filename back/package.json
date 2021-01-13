@@ -43,6 +43,7 @@
     "make": "npm run build && electron-forge make",
     "staging": "npm run build && NODE_ENV=staging nodemon ./build/src/app.js",
     "package": "electron-forge package",
+    "mongodb": "./mongodb/mongod --dbpath ./mongodb/db",
     "mongodb:install": "rm -rf mongodb; mkdir mongodb; mkdir mongodb/db; curl https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-4.4.2.tgz --output ./mongodb/mongodb-macos.tgz && tar -xvf ./mongodb/mongodb-macos.tgz -C ./mongodb/; rm -rf ./mongodb/mongodb-macos.tgz; mv mongodb/mongodb-macos-x86_64-4.4.2/bin/mongod mongodb/; rm -rf mongodb/mongodb-macos-x86_64-4.4.2"
   },
   "author": "",
@@ -69,6 +70,7 @@
   },
   "dependencies": {
     "@abandonware/noble": "^1.9.2-10",
+    "axios": "^0.21.1",
     "basic-log": "^0.1.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",

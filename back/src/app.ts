@@ -10,6 +10,7 @@ import logger from 'basic-log';
 import DiceEngine from './libs/DiceEngine/Engine/DiceEngine';
 import TimerController from './Controllers/TimerController';
 import FaceController from './Controllers/FaceController';
+import WebhookController from './Controllers/WebhookController';
 import ElectronEngine from './libs/ElectronEngine/ElectronEngine';
 import DiceFaceTime from './Models/DiceFaceTime';
 import SocketSystem from './libs/SocketActions/SocketSystem';
@@ -45,6 +46,7 @@ dotenv.config({
 	serveur.router.addController(faceController);
 	serveur.router.addController(timerController);
 	serveur.router.addController(new SocketController());
+	serveur.router.addController(new WebhookController());
 
 	// Start listenning
 	await serveur.start(Number(process.env.PORT || 9999));

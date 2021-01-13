@@ -28,6 +28,11 @@ textarea {
   font-weight: 600;
 }
 
+.common-title-section {
+  font-size: 20px;
+  font-weight: 600;
+}
+
 input[type=text] {
   height: 50px;
   font-size: 18px;
@@ -39,7 +44,7 @@ input[type=text] {
   }
 }
 
-button {
+.button {
   border: none;
   height: 50px;
   padding: 0px 32px;

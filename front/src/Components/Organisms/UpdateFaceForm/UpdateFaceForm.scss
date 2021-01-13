@@ -18,3 +18,21 @@
 .UpdateFaceForm__button {
   margin: auto;
 }
+
+.UpdateFaceForm__slack {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.UpdateFaceForm__slack__emoji {
+  margin-right: 16px;
+}
+
+.UpdateFaceForm__slack__closeEmoji {
+
+}
+
+.UpdateFaceForm__input-slack {
+  flex-grow: 1;
+}

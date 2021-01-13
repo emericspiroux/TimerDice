@@ -49,4 +49,10 @@
       background-image: url('../../../Images/Icons/dice_orange.svg');
     }
   }
+  &.settings {
+    background-image: url('../../../Images/Icons/tool_grey.svg');
+    &.selected {
+      background-image: url('../../../Images/Icons/tool_orange.svg');
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import HttpService, { SUCCESS_SUFFIX, ERROR_SUFFIX } from '../../Axios/HttpService';
-import { IDiceFace } from './dice.ducks';
+import { IDiceFace, IDiceFaceUpdate } from './dice.ducks';
 
 // Actions
 const SET = 'settings/SET';
@@ -88,7 +88,7 @@ export const getCurrentDiceFaceSettings = () => ({
   },
 });
 
-export const patchFace = (id: string, options: { name?: string; color?: string }) => ({
+export const patchFace = (id: string, options: IDiceFaceUpdate) => ({
   type: UPDATE_FACE,
   payload: {
     request: {

@@ -34,8 +34,15 @@ export default function NavBar() {
         }`}
       />
       <NavLink
-        to="/settings"
+        to="/settings/dice"
         className={`NavBar__logoWrapper NavBar__icon dice ${
+          window.location.pathname === '/settings/dice' ? 'selected' : ''
+        }`}
+      />
+
+      <NavLink
+        to="/settings"
+        className={`NavBar__logoWrapper NavBar__icon settings ${
           window.location.pathname === '/settings' ? 'selected' : ''
         }`}
       />

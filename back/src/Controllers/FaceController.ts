@@ -49,6 +49,26 @@ export default class FaceController extends AppController implements IAppControl
 				'debug',
 				'Write documentation',
 			];
+			const faceSlackStatus = [
+				'En train de coder',
+				'En pleine code review',
+				'En Réunion, Ne pas déranger !',
+				'Lit de le documentation',
+				"Est en train d'aider des gens",
+				'Est en pause',
+				'Planche sur un bug',
+				'Utilise sa plus belle plume',
+			];
+			const faceSlackEmoji = [
+				':computer:',
+				':open_book:',
+				':date:',
+				':newspaper:',
+				':fire_engine:',
+				':coffee:',
+				':bug:',
+				':memo:',
+			];
 			const faceColor = [
 				'rgb(33, 150, 243)',
 				'rgb(42, 188, 208)',
@@ -64,7 +84,11 @@ export default class FaceController extends AppController implements IAppControl
 					true,
 					faceId,
 					faceTitle[index] || `Face ${faceId}`,
-					faceColor[index] || 'blue'
+					faceColor[index] || 'blue',
+					{
+						text: faceSlackStatus[index],
+						emoji: faceSlackEmoji[index],
+					}
 				);
 				logguer.d('DiceFaces define :', dice);
 			}

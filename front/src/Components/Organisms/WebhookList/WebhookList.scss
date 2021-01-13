@@ -1,0 +1,53 @@
+@import '../../Styles/color.scss';
+
+.WebhookList {
+  position: relative;
+  width: 100%;
+}
+
+.WebhookList__element {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  word-break: break-all;
+  border-top: 1px solid $grey;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.WebhookList__element__url {
+  flex-grow: 1;
+}
+
+.WebhookList__element__delete {
+  $size: 25px;
+  width: $size;
+  height: $size;
+  flex-shrink: 0;
+  margin-left: 12px;
+  background-image: url('../../../Images/Icons/trash_grey.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 70%;
+  &:hover {
+    background-image: url('../../../Images/Icons/trash_red.svg');
+  }
+}
+
+.WebhookList__webhookform {
+  border-top: 1px solid $grey;
+  border-bottom: 1px solid $grey;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.WebhookList__loader {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+
+
+
