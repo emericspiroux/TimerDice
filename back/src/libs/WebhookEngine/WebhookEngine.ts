@@ -4,19 +4,20 @@ import WebhookModel, { IWebhook } from '../../Models/Webhook.model';
 
 export default class WebhookEngine {
 	static shared = new WebhookEngine();
+	private timeout?: NodeJS.Timeout;
 
-	async execute(diceTime: IDiceFaceTime | undefined) {
-		const webhooks = await WebhookModel.getAll();
-		for (const webhook of webhooks) {
-			this.send(webhook, diceTime);
-		}
+	async execute(diceTime?: IDiceFaceTime) {
+		if (this.timeout) clearTimeout(this.timeout);
+		this.timeout = setTimeout(async () => {
+			const webhooks = await WebhookModel.getAll();
+			for (const webhook of webhooks) {
+				this.send(webhook, diceTime);
+			}
+		}, 1000);
 	}
 
 	async clean() {
-		const webhooks = await WebhookModel.getAll();
-		for (const webhook of webhooks) {
-			this.send(webhook);
-		}
+		this.execute();
 	}
 
 	async send(webhook: IWebhook, diceTime?: IDiceFaceTime) {

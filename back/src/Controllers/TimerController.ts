@@ -11,7 +11,6 @@ import DiceFaceTime, { IDiceFaceTime, IDiceFaceTimeUpdateBody } from '../Models/
 import ModelError from '../Models/Errors/ModelError';
 import DiceFace from '../Models/DiceFace';
 import DiceObject from '../libs/DiceEngine/DiceObject/DiceObject';
-import SocketServeur from '../Serveur/Sockets/SockerServeur';
 import { idParamsValidation } from './validations/Atoms/Params/IdParamsValidations';
 import SocketSystem from '../libs/SocketActions/SocketSystem';
 import ElectronEngine from '../libs/ElectronEngine/ElectronEngine';
@@ -20,7 +19,6 @@ import WebhookEngine from '../libs/WebhookEngine/WebhookEngine';
 export default class DiceController extends AppController implements IAppController {
 	baseRoute: AppRouteDescriptor;
 	private previous = -1;
-	private webhookEngine = new WebhookEngine();
 
 	constructor() {
 		super();
@@ -71,14 +69,14 @@ export default class DiceController extends AppController implements IAppControl
 				logguer.d(
 					'Stopping diceFaceTime duration :',
 					diceFaceTimeStop.duration,
-					Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE || 60000)
+					Number(process.env.TIMEOUT_DURATION_BEFORE_SAVE || 60000)
 				);
 				SocketSystem.fireStopCurrentDice();
 				WebhookEngine.shared.clean();
 				ElectronEngine.shared.onChange();
 				if (
-					process.env.TIMETOUT_DURATION_BEFORE_SAVE &&
-					diceFaceTimeStop.duration < Number(process.env.TIMETOUT_DURATION_BEFORE_SAVE || 60000)
+					process.env.TIMEOUT_DURATION_BEFORE_SAVE &&
+					diceFaceTimeStop.duration < Number(process.env.TIMEOUT_DURATION_BEFORE_SAVE || 30000)
 				) {
 					logguer.d('Deleting diceFaceTime because too short :', diceFaceTimeStop.id);
 					await DiceFaceTime.deleting(diceFaceTimeStop.id);
@@ -123,7 +121,6 @@ export default class DiceController extends AppController implements IAppControl
 		try {
 			console.log('Get current');
 			const current = await DiceFaceTime.getCurrent();
-			console.log('🚀 ~ file: TimerController.ts ~ line 121 ~ DiceController ~ getCurrent ~ current', current);
 			res.send(current);
 		} catch (err) {
 			if (err instanceof ModelError) {
@@ -137,6 +134,7 @@ export default class DiceController extends AppController implements IAppControl
 		try {
 			ElectronEngine.shared.onChange();
 			SocketSystem.fireStopCurrentDice();
+			WebhookEngine.shared.clean();
 			res.send(await DiceFaceTime.stop());
 		} catch (err) {
 			if (err instanceof ModelError) {
@@ -154,6 +152,7 @@ export default class DiceController extends AppController implements IAppControl
 			);
 			res.send(diceFaceTime);
 			if (diceFaceTime.current) {
+				WebhookEngine.shared.execute(diceFaceTime);
 				ElectronEngine.shared.onChange(diceFaceTime);
 			}
 		} catch (err) {

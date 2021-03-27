@@ -14,6 +14,7 @@ import WebhookController from './Controllers/WebhookController';
 import ElectronEngine from './libs/ElectronEngine/ElectronEngine';
 import DiceFaceTime from './Models/DiceFaceTime';
 import SocketSystem from './libs/SocketActions/SocketSystem';
+import WebhookEngine from './libs/WebhookEngine/WebhookEngine';
 
 // Getting env var
 dotenv.config({
@@ -66,6 +67,7 @@ dotenv.config({
 			await DiceFaceTime.stop();
 			ElectronEngine.shared.onChange();
 			SocketSystem.fireStopCurrentDice();
+			WebhookEngine.shared.clean();
 		});
 		ElectronEngine.shared.init();
 	}
