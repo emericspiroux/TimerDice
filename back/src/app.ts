@@ -69,6 +69,6 @@ dotenv.config({
 			SocketSystem.fireStopCurrentDice();
 			WebhookEngine.shared.clean();
 		});
-		ElectronEngine.shared.init();
+		await ElectronEngine.shared.init();
 	}
 })();

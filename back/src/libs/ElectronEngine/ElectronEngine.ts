@@ -1,9 +1,11 @@
 import { app, BrowserWindow, Tray, Menu } from 'electron';
 import { Event, MenuItemConstructorOptions } from 'electron/main';
 import logguer from 'basic-log';
-import { IDiceFaceTime } from '../../Models/DiceFaceTime';
+import DiceFaceTime, { IDiceFaceTime } from '../../Models/DiceFaceTime';
 import fs from 'fs';
 import Path from 'path';
+import DiceFace from '../../Models/DiceFace';
+import DiceEngine from '../DiceEngine/Engine/DiceEngine';
 
 export default class ElectronEngine {
 	static shared = new ElectronEngine();
@@ -36,6 +38,14 @@ export default class ElectronEngine {
 				type: 'separator',
 			},
 			{
+				label: 'Chargement en cours...',
+				type: 'normal',
+				enabled: false,
+			},
+			{
+				type: 'separator',
+			},
+			{
 				label: 'Fermer Timer Dice',
 				click: () => {
 					if (this.onCloseAction) {
@@ -49,6 +59,37 @@ export default class ElectronEngine {
 
 	setOnStopDice(callback: () => void) {
 		this.onStopDice = callback;
+	}
+
+	async reloadFacesSubmenu(hasDice: boolean) {
+		const faces = await DiceFace.getAll();
+		let currentFaceId = -1;
+		if (hasDice) {
+			try {
+				const currentTracking = await DiceFaceTime.getCurrent();
+				currentFaceId = currentTracking.faceId;
+			} catch (err) {
+				logguer.e('Error on reload submenu:', err);
+			}
+		}
+		const index = this.contextMenuArray.findIndex(
+			(element) => element.label === 'Chargement en cours...' || element.label === 'Démarrer une activité'
+		);
+		if (index === -1) return logguer.e('Unable to find index for context menu');
+		this.contextMenuArray[index].label = 'Démarrer une activité';
+		this.contextMenuArray[index].type = 'submenu';
+		this.contextMenuArray[index].submenu = faces.map((face) => {
+			return {
+				label: face.name,
+				click: async () => {
+					await DiceEngine.shared.stopTracking();
+					await DiceEngine.shared.startTracking(face.faceId);
+				},
+				enabled: currentFaceId !== face.faceId,
+			};
+		});
+		this.contextMenuArray[index].enabled = true;
+		this.tray?.setContextMenu(Menu.buildFromTemplate(this.contextMenuArray));
 	}
 
 	private createWindow() {
@@ -80,8 +121,9 @@ export default class ElectronEngine {
 		this.tray.setContextMenu(Menu.buildFromTemplate(this.contextMenuArray));
 	}
 
-	onChange(dice?: IDiceFaceTime) {
+	async onChange(dice?: IDiceFaceTime) {
 		if (!this.isInited || !this.tray) return;
+		await this.reloadFacesSubmenu(!!dice);
 		const labelStop = "Stopper l'activité";
 		if (!dice) {
 			this.contextMenuArray[0].label = 'Aucune activité en cours';
@@ -107,7 +149,7 @@ export default class ElectronEngine {
 		this.onCloseAction = onCloseAction;
 	}
 
-	init() {
+	async init() {
 		this.win = new BrowserWindow({
 			width: 800,
 			height: 600,
@@ -115,6 +157,7 @@ export default class ElectronEngine {
 				nodeIntegration: true,
 			},
 		});
+		this.win.maximize();
 		this.tray = new Tray(`${__dirname}/../../../assets/logo-white@2x.png`);
 
 		app.whenReady().then(() => {
@@ -136,6 +179,7 @@ export default class ElectronEngine {
 				this.createTray();
 			}
 		});
+		await this.reloadFacesSubmenu();
 		this.isInited = true;
 	}
 }
