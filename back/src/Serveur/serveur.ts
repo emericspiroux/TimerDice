@@ -17,6 +17,7 @@ import SocketServeur from './Sockets/SockerServeur';
 
 import ModelError from '../Models/Errors/ModelError';
 import ElectronEngine from '../libs/ElectronEngine/ElectronEngine';
+import TimerDiceError from '../Errors/TimerDiceError';
 
 export default class Serveur {
 	public app: Express = express();
@@ -71,8 +72,7 @@ export default class Serveur {
 	private initErrorRoute() {
 		this.app.use((err: any, _1: Request, res: Response, _2: NextFunction) => {
 			logguer.e('Serveur -> initErrorRoute -> err', err);
-			if (err instanceof ControllerError) return res.status(err.status).send(err);
-			if (err instanceof ModelError) return res.status(err.status).send(err);
+			if (err instanceof TimerDiceError) return res.status(err.status).send(err);
 			if ('type' in err) return res.status(400).send(err);
 			if (logguer.level === 'debug' || logguer.level === 'all') return res.status(500).send(err);
 			res.status(500).send({ statusCode: 500, message: 'Internal error' });

@@ -36,8 +36,8 @@ export default class FaceController extends AppController implements IAppControl
 	}
 
 	async initFaceDefault(override = false) {
-		logguer.d('DiceFaces init...');
 		if (override || !(await DiceFace.getFace(1))) {
+			logguer.d('DiceFaces seeding...');
 			const faceIds = [1, 2, 3, 4, 5, 6, 7, 8];
 			const faceTitle = [
 				'Code',
@@ -93,7 +93,7 @@ export default class FaceController extends AppController implements IAppControl
 				logguer.d('DiceFaces define :', dice);
 			}
 		} else {
-			logguer.d('DiceFaces already inited. Skipped.');
+			logguer.d('DiceFaces already seeded.');
 		}
 		const settingDice = await DiceFace.getCurrentSettings();
 		if (settingDice) {

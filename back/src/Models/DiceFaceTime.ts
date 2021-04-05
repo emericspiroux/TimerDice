@@ -1,9 +1,6 @@
-import { number, object, string } from 'joi';
 import { model, Schema, Document, Model } from 'mongoose';
-import { start } from 'repl';
 import DiceFace, { IDiceFace, name as DiceFaceName } from './DiceFace';
-import { NoCurrentDiceError, WrongStartEndDiceError } from './Errors/DiceError';
-import ModelError from './Errors/ModelError';
+import { NoCurrentDiceError, AlreadyStartedCurrentDiceError } from './Errors/DiceError';
 
 const DiceFaceTimeSchema = new Schema({
 	current: Boolean,
@@ -135,14 +132,22 @@ DiceFaceTimeSchema.statics.getByRange = async function (
 };
 
 DiceFaceTimeSchema.statics.start = async function (face: IDiceFace): Promise<IDiceFace> {
-	const element = new this({
-		face,
-		faceId: face.faceId,
-		start: new Date(),
-		current: true,
-	});
+	try {
+		await this.getCurrent();
+	} catch (err) {
+		if (err instanceof NoCurrentDiceError) {
+			const element = new this({
+				face,
+				faceId: face.faceId,
+				start: new Date(),
+				current: true,
+			});
 
-	return await element.save();
+			return await element.save();
+		} else {
+			throw new AlreadyStartedCurrentDiceError(name);
+		}
+	}
 };
 
 DiceFaceTimeSchema.statics.stop = async function (): Promise<IDiceFace> {

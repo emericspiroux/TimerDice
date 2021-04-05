@@ -56,7 +56,7 @@ dotenv.config({
 	await faceController.initFaceDefault();
 
 	// Launching dice detection
-	DiceEngine.shared.start(timerController.onChangeDiceFace);
+	DiceEngine.shared.start();
 
 	// Launch electron
 	if (process.env.NODE_ENV !== 'development') {

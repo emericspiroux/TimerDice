@@ -1,5 +1,11 @@
 import ModelError from './ModelError';
 
+export class AlreadyStartedCurrentDiceError extends ModelError {
+	constructor(modelName: string) {
+		super(modelName, 400, 'has_already_current', 'Please stop current before starting new one');
+	}
+}
+
 export class NoCurrentDiceError extends ModelError {
 	constructor(modelName: string) {
 		super(modelName, 404, 'no_current', 'No current face time started');

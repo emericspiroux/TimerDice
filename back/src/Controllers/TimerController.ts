@@ -1,4 +1,4 @@
-import { NextFunction, request, Request, Response, Router } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import logguer from 'basic-log';
 
 import AppController, { IAppController } from './Types/AppController.abstract';
@@ -9,12 +9,12 @@ import { DiceFaceOrDateValidations } from './validations/Organismes/DiceFaceOrDa
 import { DiceFaceTimeUpdateBodyValidations } from './validations/Atoms/Body/DiceFaceTimeUpdateValidations';
 import DiceFaceTime, { IDiceFaceTime, IDiceFaceTimeUpdateBody } from '../Models/DiceFaceTime';
 import ModelError from '../Models/Errors/ModelError';
-import DiceFace from '../Models/DiceFace';
-import DiceObject from '../libs/DiceEngine/DiceObject/DiceObject';
 import { idParamsValidation } from './validations/Atoms/Params/IdParamsValidations';
 import SocketSystem from '../libs/SocketActions/SocketSystem';
 import ElectronEngine from '../libs/ElectronEngine/ElectronEngine';
 import WebhookEngine from '../libs/WebhookEngine/WebhookEngine';
+import DiceEngine from '../libs/DiceEngine/Engine/DiceEngine';
+import { DiceFaceValidations } from './validations/Atoms/Params/DiceFaceValidations';
 
 export default class DiceController extends AppController implements IAppController {
 	baseRoute: AppRouteDescriptor;
@@ -29,6 +29,7 @@ export default class DiceController extends AppController implements IAppControl
 
 	getRoute(): Router {
 		this.router.get('/', DiceFaceOrDateValidations, FormErrorMiddleware, this.getRange.bind(this));
+		this.router.post('/start/:face', DiceFaceValidations, FormErrorMiddleware, this.startNew.bind(this));
 		this.router.get('/calendar', DiceFaceOrDateValidations, FormErrorMiddleware, this.getCalendar.bind(this));
 		this.router.get('/current', this.getCurrent.bind(this));
 		this.router.delete('/current', this.stopCurrent.bind(this));
@@ -78,17 +79,14 @@ export default class DiceController extends AppController implements IAppControl
 		}
 	}
 
-	private async startNew(_: Request, res: Response, next: NextFunction): Promise<void> {
+	private async startNew(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			console.log('Get current');
-			const current = await DiceFaceTime.getCurrent();
-			if (current) {
-			}
+			res.send(await DiceEngine.shared.startTracking(Number.parseInt(req.params.face)));
 		} catch (err) {
 			if (err instanceof ModelError) {
 				return next(err);
 			}
-			next(new ControllerError(500, 'unable to get current', err.stack));
+			next(new ControllerError(500, 'unable to start new tracking', err.stack));
 		}
 	}
 

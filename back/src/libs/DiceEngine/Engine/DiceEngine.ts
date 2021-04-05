@@ -4,7 +4,7 @@ import DiceBLE from './DiceBLE';
 import logguer from 'basic-log';
 import SocketSystem from '../../SocketActions/SocketSystem';
 import DiceFace from '../../../Models/DiceFace';
-import DiceFaceTime from '../../../Models/DiceFaceTime';
+import DiceFaceTime, { IDiceFaceTime } from '../../../Models/DiceFaceTime';
 import WebhookEngine from '../../WebhookEngine/WebhookEngine';
 import ElectronEngine from '../../ElectronEngine/ElectronEngine';
 
@@ -17,9 +17,9 @@ export default class DiceEngine {
 		this.ble = new DiceBLE();
 	}
 
-	start(onChange: DiceOnChangePosition) {
+	start() {
 		logguer.d('Start DiceEngine');
-		this.ble.setOnDetectDice(onChange);
+		this.ble.setOnDetectDice(this.onChange.bind(this));
 		this.ble.start('TimerDice');
 	}
 
@@ -38,22 +38,25 @@ export default class DiceEngine {
 				}
 				return;
 			}
-			this.stopTracking();
+			await this.stopTracking();
 			if (dice.face !== -1) {
-				this.startTracking(dice.face);
+				await this.startTracking(dice.face);
 			}
 		}
 	}
 
-	async startTracking(faceId: number) {
+	async startTracking(faceId: number): Promise<IDiceFaceTime | undefined> {
 		if (faceId !== -1) {
 			const diceFace = await DiceFace.getFace(faceId);
+			if (!diceFace) throw new Error('Dice face not found');
 			const diceFaceTimeStart = await DiceFaceTime.start(diceFace);
 			ElectronEngine.shared.onChange(diceFaceTimeStart);
 			SocketSystem.fireStartCurrentDice(diceFaceTimeStart);
 			WebhookEngine.shared.execute(diceFaceTimeStart);
 			logguer.i('Starting diceFaceTime :', diceFaceTimeStart.faceId);
+			return diceFaceTimeStart;
 		}
+		return;
 	}
 
 	async stopTracking() {
