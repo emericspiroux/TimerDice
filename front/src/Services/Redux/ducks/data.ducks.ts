@@ -5,6 +5,7 @@ import { IDiceFace, IDiceFaceTime } from './dice.ducks';
 // Actions
 const GET_STANDUP = 'diceTime/GET_STANDUP';
 const DELETE_EVENT_RANGE = 'diceTime/DELETE_EVENT_RANGE';
+const START_TRACKING_RANGE = 'diceTime/START_TRACKING_RANGE';
 
 // Types
 type TDataAction = {
@@ -106,6 +107,32 @@ export const deleteEventRange = (element: IDiceFaceTime) => ({
         dispatch({
           type: action.type + SUCCESS_SUFFIX,
           deletedElement: element,
+          meta: { previousAction: action },
+        });
+      },
+      /* eslint-disable-next-line no-unused-vars */
+      onError: ({ action, dispatch, _, error }) => {
+        dispatch({
+          type: action.type + ERROR_SUFFIX,
+          error,
+          meta: { previousAction: action },
+        });
+      },
+    },
+  },
+});
+
+export const startTracking = (diceFace: IDiceFace) => ({
+  type: START_TRACKING_RANGE,
+  payload: {
+    request: {
+      url: `/timer/start/${diceFace.faceId}`,
+      method: HttpService.HttpMethods.POST,
+    },
+    options: {
+      onSuccess: ({ action, dispatch }) => {
+        dispatch({
+          type: action.type + SUCCESS_SUFFIX,
           meta: { previousAction: action },
         });
       },

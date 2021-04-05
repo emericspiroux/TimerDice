@@ -1,0 +1,50 @@
+@import '../../Styles/color.scss';
+
+.FaceFormList {
+  display: grid;
+  box-sizing: border-box;
+  grid-template-rows: repeat(3, 100px);
+  grid-template-columns: calc(33% - 12px) calc(33% - 12px) 33%;
+  column-gap: 12px;
+  row-gap: 12px;
+}
+
+.FaceFormList--loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.FaceFormList__element {
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $grey;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  &:hover {
+    border-color: $blue;
+    .FaceFormList__element__name {
+      color: $blue;
+    }
+    .FaceFormList__element__circle {
+      transform: scale(1.3);
+    }
+  }
+}
+
+.FaceFormList__element__circle {
+  $size: 30px;
+  border-radius: 50%;
+  width: $size;
+  height: $size;
+  flex-shrink: 0;
+  transition: transform 200ms;
+}
+
+.FaceFormList__element__name {
+  margin-top: 12px;
+  text-align: center;
+}

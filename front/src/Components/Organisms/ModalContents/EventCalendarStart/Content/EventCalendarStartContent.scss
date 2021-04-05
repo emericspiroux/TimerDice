@@ -1,0 +1,47 @@
+@import '../../../../Styles/color';
+
+.EventCalendarStartContent {
+  max-width: 600px;
+  width: 600px;
+  max-width: 100%;
+  padding: 32px;
+  background-color: white;
+  border-radius: 20px;
+}
+
+.EventCalendarStartContent__top {
+  display: flex;
+}
+
+.EventCalendarStartContent__titleRow {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.EventCalendarStartContent__titleRow__title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.EventCalendarStartContent__menu {
+  display: flex;
+}
+
+.EventCalendarStartContent__menu-button {
+  $size: 20px;
+  width: $size;
+  height: $size;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  margin-left: 12px;
+  cursor: pointer;
+}
+
+.EventCalendarStartContent__menu__close {
+  background-image: url('../../../../../Images/Icons/close.svg');
+  &:hover {
+    background-image: url('../../../../../Images/Icons/close_black.svg');
+  }
+}

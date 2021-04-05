@@ -22,6 +22,8 @@ import {
 } from '../../Services/Redux/ducks/calendar.ducks';
 import { hideModal, showModal } from '../../Services/Redux/ducks/modal.ducks';
 import EventCalendarOneContent from '../Organisms/ModalContents/EventCalendarOne/Content/EventCalendarOneContent';
+import EventCalendarStartContent from '../Organisms/ModalContents/EventCalendarStart/Content/EventCalendarStartContent';
+import { startTracking } from '../../Services/Redux/ducks/data.ducks';
 
 const localizer = momentLocalizer(moment);
 const startDate = new Date();
@@ -152,6 +154,19 @@ export default function CurrentDicePage() {
     );
   }
 
+  function onStart() {
+    dispatch(
+      showModal(
+        <EventCalendarStartContent
+          onStart={(face) => {
+            dispatch(startTracking(face));
+            dispatch(hideModal());
+          }}
+        />,
+      ),
+    );
+  }
+
   // eslint-disable-next-line no-shadow
   function eventStyleGetter(event: Event, _: any, _2: any, isSelected: boolean) {
     return {
@@ -166,7 +181,7 @@ export default function CurrentDicePage() {
   return (
     <div className="CurrentDicePage Page">
       <div className="CurrentDicePage__diceTimerWrapper">
-        <DiceTimer current={currentDice} isLoading={isLoadingCurrent} onUpdate={onUpdate} />
+        <DiceTimer current={currentDice} isLoading={isLoadingCurrent} onUpdate={onUpdate} onStart={onStart} />
       </div>
       <div className="CurrentDicePage__calendarWrapper">
         <DnDCalendar

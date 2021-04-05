@@ -9,11 +9,13 @@ export default function DiceTimer({
   current,
   isLoading,
   onUpdate,
+  onStart,
 }: {
   current: IDiceFaceTime | undefined;
   isLoading: boolean;
   // eslint-disable-next-line
-  onUpdate: (current: IDiceFaceTime) => void;
+  onUpdate?: (current: IDiceFaceTime) => void;
+  onStart?: () => void;
 }) {
   const sinceDate = useSinceDate(current?.start);
   return (
@@ -32,7 +34,7 @@ export default function DiceTimer({
                 <Loader size="15px" />
               </div>
             ) : (
-              <div className="DiceTimer__content__update clickable" onClick={() => onUpdate(current)}>
+              <div className="DiceTimer__content__update clickable" onClick={() => onUpdate!(current)}>
                 Modifier
               </div>
             )}
@@ -40,6 +42,9 @@ export default function DiceTimer({
         ) : (
           <div className="DiceTimer__content">
             <div>Pas d&apos;activité en cours</div>
+            <div className="DiceTimer__content__update clickable" onClick={() => onStart!()}>
+              Démarrer
+            </div>
             {isLoading && (
               <div className="DiceTimer__content__loader">
                 <Loader size="15px" />
@@ -51,3 +56,8 @@ export default function DiceTimer({
     </div>
   );
 }
+
+DiceTimer.defaultProps = {
+  onUpdate: () => {},
+  onStart: () => {},
+};
