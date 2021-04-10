@@ -15,7 +15,7 @@ export default function StandupSummary() {
   const dispatch = useDispatch();
   const [last24hDate] = useState<Date>(() => {
     const last24hDateDefine = new Date();
-    last24hDateDefine.setHours(last24hDateDefine.getHours() - 26);
+    last24hDateDefine.setHours(last24hDateDefine.getHours() - 24);
     return last24hDateDefine;
   });
   const rangeEvents: IDiceFaceTimeRangeElement[] = useSelector((state: any) => _.get(state, 'data.current'), []);

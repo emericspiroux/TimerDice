@@ -69,10 +69,10 @@ DiceFaceTimeSchema.statics.getCalendar = async function (
 ): Promise<IEventBigCalendar[]> {
 	let request: any = { current: false };
 	if (start) {
-		request.end = { $gt: start };
+		request.end = { $gte: start };
 	}
 	if (end) {
-		request.end = { $lt: end };
+		request.end = { $lte: end };
 	}
 	if (faceId) {
 		request['face.faceId'] = faceId;
@@ -105,10 +105,10 @@ DiceFaceTimeSchema.statics.getByRange = async function (
 ): Promise<TDiceTimeRange> {
 	let request: any = { current: false };
 	if (start) {
-		request.end = { $gt: start };
+		request.start = { $gte: start };
 	}
 	if (end) {
-		request.end = { $lt: end };
+		request.end = { $lte: end };
 	}
 	if (faceId) {
 		request['face.faceId'] = faceId;
