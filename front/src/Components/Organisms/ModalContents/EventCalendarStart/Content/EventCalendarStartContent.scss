@@ -15,8 +15,14 @@
 
 .EventCalendarStartContent__titleRow {
   display: flex;
-  align-items: center;
+  justify-content: center;
+  flex-direction: column;
   flex-grow: 1;
+}
+
+.EventCalendarStartContent__timeRow {
+  font-size: 12px;
+  color: $grey-darker;
 }
 
 .EventCalendarStartContent__titleRow__title {

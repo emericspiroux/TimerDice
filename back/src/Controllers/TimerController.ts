@@ -15,6 +15,8 @@ import ElectronEngine from '../libs/ElectronEngine/ElectronEngine';
 import WebhookEngine from '../libs/WebhookEngine/WebhookEngine';
 import DiceEngine from '../libs/DiceEngine/Engine/DiceEngine';
 import { DiceFaceValidations } from './validations/Atoms/Params/DiceFaceValidations';
+import { NewRangeTimeValidations } from './validations/Organismes/Body/NewRangeTimeValidations';
+import DiceFace from '../Models/DiceFace';
 
 export default class DiceController extends AppController implements IAppController {
 	baseRoute: AppRouteDescriptor;
@@ -29,6 +31,7 @@ export default class DiceController extends AppController implements IAppControl
 
 	getRoute(): Router {
 		this.router.get('/', DiceFaceOrDateValidations, FormErrorMiddleware, this.getRange.bind(this));
+		this.router.post('/', NewRangeTimeValidations, FormErrorMiddleware, this.newRange.bind(this));
 		this.router.post('/start/:face', DiceFaceValidations, FormErrorMiddleware, this.startNew.bind(this));
 		this.router.get('/calendar', DiceFaceOrDateValidations, FormErrorMiddleware, this.getCalendar.bind(this));
 		this.router.get('/current', this.getCurrent.bind(this));
@@ -52,6 +55,18 @@ export default class DiceController extends AppController implements IAppControl
 			res.send(await DiceFaceTime.getByRange(start, end, face));
 		} catch (err) {
 			next(new ControllerError(500, 'unable to get range', err.stack));
+		}
+	}
+
+	private async newRange(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const start = (req.body['start'] && new Date(req.body['start'] as string)) || null;
+			const end = (req.body['end'] && new Date(req.body['end'] as string)) || null;
+			const faceId = (req.body['face'] && Number(req.body['face'] as string)) || null;
+			const face = await DiceFace.getFace(faceId);
+			res.send(await DiceFaceTime.newRange(face, start, end));
+		} catch (err) {
+			next(new ControllerError(500, 'unable to define new range', err.stack));
 		}
 	}
 

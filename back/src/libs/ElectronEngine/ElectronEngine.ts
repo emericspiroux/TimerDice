@@ -61,7 +61,7 @@ export default class ElectronEngine {
 		this.onStopDice = callback;
 	}
 
-	async reloadFacesSubmenu(hasDice: boolean) {
+	async reloadFacesSubmenu(hasDice?: boolean) {
 		const faces = await DiceFace.getAll();
 		let currentFaceId = -1;
 		if (hasDice) {

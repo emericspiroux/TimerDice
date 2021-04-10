@@ -49,6 +49,7 @@ export interface IDiceFaceTimeModel extends Model<IDiceFaceTime> {
 	getCurrent(): Promise<IDiceFaceTime>;
 	getByRange(start: Date, end?: Date, faceId?: number): Promise<TDiceTimeRangeObject[]>;
 	start(face: IDiceFace): Promise<IDiceFaceTime>;
+	newRange(face: IDiceFace, start: Date, end: Date);
 	stop(): Promise<IDiceFaceTime>;
 	updating(id: string, body: IDiceFaceTimeUpdateBody);
 	deleting(id: string): any;
@@ -148,6 +149,30 @@ DiceFaceTimeSchema.statics.start = async function (face: IDiceFace): Promise<IDi
 			throw new AlreadyStartedCurrentDiceError(name);
 		}
 	}
+};
+
+DiceFaceTimeSchema.statics.newRange = async function (
+	face: IDiceFace,
+	start: Date,
+	end: Date
+): Promise<IEventBigCalendar> {
+	const element = new this({
+		face,
+		faceId: face.faceId,
+		start,
+		end,
+		current: false,
+	});
+
+	await element.save();
+
+	return {
+		start: element.start,
+		end: element.end,
+		hexColor: element.face.color,
+		title: element.face.name,
+		resource: element,
+	};
 };
 
 DiceFaceTimeSchema.statics.stop = async function (): Promise<IDiceFace> {

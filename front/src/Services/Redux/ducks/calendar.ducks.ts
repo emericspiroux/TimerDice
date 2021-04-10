@@ -7,11 +7,13 @@ const GET_CALENDAR = 'calendar/GET_CALENDAR';
 const SET_CURRENT_DATE = 'calendar/SET_CURRENT_DATE';
 const UPDATE_EVENT = 'calendar/UPDATE_EVENT';
 const DELETE_EVENT = 'calendar/DELETE_EVENT';
+const NEW_RANGE_EVENT = 'calendat/NEW_RANGE_EVENT';
 
 // Types
 type TEventAction = {
   type?: string;
   calendarEvents?: IEventBigCalendar[];
+  newRangeEvent?: IEventBigCalendar;
   startDate?: Date;
   endDate?: Date;
   diceFaceTimeElement?: IDiceFaceTime;
@@ -89,6 +91,14 @@ export default function reducer(state: any = {}, action: TEventAction = {}) {
       newState.current = action.calendarEvents;
       newState.isLoading = false;
       return newState;
+    case NEW_RANGE_EVENT:
+      newState.isLoading = true;
+      return newState;
+    case NEW_RANGE_EVENT + SUCCESS_SUFFIX:
+      newState.current = [...newState.current] || [];
+      newState.current.push(action.newRangeEvent);
+      newState.isLoading = false;
+      return newState;
     case GET_CALENDAR + ERROR_SUFFIX:
       newState.error = action.error;
       newState.isLoading = false;
@@ -146,6 +156,34 @@ export const patchEvent = (
         dispatch({
           type: action.type + SUCCESS_SUFFIX,
           diceFaceTimeElement: response.data,
+          meta: { previousAction: action },
+        });
+      },
+      /* eslint-disable-next-line no-unused-vars */
+      onError: ({ action, dispatch, _, error }) => {
+        dispatch({
+          type: action.type + ERROR_SUFFIX,
+          error,
+          meta: { previousAction: action },
+        });
+      },
+    },
+  },
+});
+
+export const newRangeEvent = (options: { start: Date; end: Date; face: number }) => ({
+  type: NEW_RANGE_EVENT,
+  payload: {
+    request: {
+      url: `/timer`,
+      method: HttpService.HttpMethods.POST,
+      data: options,
+    },
+    options: {
+      onSuccess: ({ action, dispatch, response }) => {
+        dispatch({
+          type: action.type + SUCCESS_SUFFIX,
+          newRangeEvent: response.data,
           meta: { previousAction: action },
         });
       },

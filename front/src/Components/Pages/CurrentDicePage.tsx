@@ -17,6 +17,7 @@ import {
   getCalendar,
   IEventBigCalendar,
   IEventBigCalendarDrop,
+  newRangeEvent,
   patchEvent,
   setCurrentDate,
 } from '../../Services/Redux/ducks/calendar.ducks';
@@ -104,7 +105,7 @@ export default function CurrentDicePage() {
     if (timeId) clearTimeout(timeId);
     timeId = setTimeout(() => {
       dispatch(patchEvent(event.id, { description: value }));
-      if (event.id === currentDice.id) dispatch(getCurrentDiceFaceTime());
+      if (event.id === currentDice?.id) dispatch(getCurrentDiceFaceTime());
     }, 1000);
   }
 
@@ -134,6 +135,31 @@ export default function CurrentDicePage() {
     );
   }
 
+  function onSelectSlot(slot: any) {
+    if (!slot.bounds) return;
+    dispatch(
+      showModal(
+        <EventCalendarStartContent
+          range={{
+            start: new Date(slot.start),
+            end: new Date(slot.end),
+          }}
+          title="Définir le type de l'activité"
+          onStart={(face) => {
+            dispatch(
+              newRangeEvent({
+                face: face.faceId,
+                start: slot.start,
+                end: slot.end,
+              }),
+            );
+            dispatch(hideModal());
+          }}
+        />,
+      ),
+    );
+  }
+
   function onStopEvent() {
     dispatch(stopCurrentDiceFaceTime());
     dispatch(getCalendar(currentDate.start, currentDate.end));
@@ -158,6 +184,7 @@ export default function CurrentDicePage() {
     dispatch(
       showModal(
         <EventCalendarStartContent
+          title="Démarrer une nouvelle activité"
           onStart={(face) => {
             dispatch(startTracking(face));
             dispatch(hideModal());
@@ -202,6 +229,7 @@ export default function CurrentDicePage() {
             []
           }
           onEventDrop={onEventResizeOrDrop}
+          onSelectSlot={onSelectSlot}
           onEventResize={onEventResizeOrDrop}
           onSelectEvent={onSelected}
           allDayAccessor={() => false}
@@ -214,6 +242,7 @@ export default function CurrentDicePage() {
           onRangeChange={onRangeChange}
           style={{ width: '100%' }}
           resizable
+          selectable
         />
       </div>
     </div>
