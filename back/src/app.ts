@@ -41,19 +41,13 @@ dotenv.config({
 	});
 
 	// Add controllers
-	const faceController = new FaceController();
-	const timerController = new TimerController();
-
-	serveur.router.addController(faceController);
-	serveur.router.addController(timerController);
+	serveur.router.addController(new FaceController());
+	serveur.router.addController(new TimerController());
 	serveur.router.addController(new SocketController());
 	serveur.router.addController(new WebhookController());
 
 	// Start listenning
 	await serveur.start(Number(process.env.PORT || 9999));
-
-	// Init dices faces
-	await faceController.initFaceDefault();
 
 	// Launching dice detection
 	DiceEngine.shared.start();

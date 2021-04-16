@@ -6,6 +6,8 @@ const REMOVE = 'diceTime/REMOVE';
 const GET_CURRENT = 'diceTime/GET_CURRENT';
 const STOP_CURRENT = 'diceTime/STOP_CURRENT';
 const GET_ALL_FACES = 'diceTime/GET_ALL_FACES';
+const START_CURRENT_DICE_SETTING = 'diceTime/START_CURRENT_DICE_SETTING';
+const STOP_CURRENT_DICE_SETTING = 'diceTime/STOP_CURRENT_DICE_SETTING';
 
 // Types
 type TDiceAction = {
@@ -175,6 +177,59 @@ export const getAllFaces = () => ({
         dispatch({
           type: action.type + SUCCESS_SUFFIX,
           faces: response.data,
+          meta: { previousAction: action },
+        });
+      },
+      /* eslint-disable-next-line no-unused-vars */
+      onError: ({ action, dispatch, _, error }) => {
+        dispatch({
+          type: action.type + ERROR_SUFFIX,
+          error,
+          meta: { previousAction: action },
+        });
+      },
+    },
+  },
+});
+
+// Action Settings
+export const startCurrentSettingDiceFace = (faceNumber: number) => ({
+  type: START_CURRENT_DICE_SETTING,
+  payload: {
+    request: {
+      url: `/face/settings/start?face=${faceNumber}`,
+      method: HttpService.HttpMethods.POST,
+    },
+    options: {
+      onSuccess: ({ action, dispatch }) => {
+        dispatch({
+          type: action.type + SUCCESS_SUFFIX,
+          meta: { previousAction: action },
+        });
+      },
+      /* eslint-disable-next-line no-unused-vars */
+      onError: ({ action, dispatch, _, error }) => {
+        dispatch({
+          type: action.type + ERROR_SUFFIX,
+          error,
+          meta: { previousAction: action },
+        });
+      },
+    },
+  },
+});
+
+export const stopCurrentSettingDiceFace = () => ({
+  type: STOP_CURRENT_DICE_SETTING,
+  payload: {
+    request: {
+      url: `/face/settings/stop`,
+      method: HttpService.HttpMethods.POST,
+    },
+    options: {
+      onSuccess: ({ action, dispatch }) => {
+        dispatch({
+          type: action.type + SUCCESS_SUFFIX,
           meta: { previousAction: action },
         });
       },

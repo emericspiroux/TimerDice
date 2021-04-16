@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import logguer from 'basic-log';
 
 import AppController, { IAppController } from './Types/AppController.abstract';
 import AppRouteDescriptor from './Types/AppRouteDescriptor.type';
@@ -9,6 +8,7 @@ import ModelError from '../Models/Errors/ModelError';
 import DiceFace, { IDiceFaceUpdateBody } from '../Models/DiceFace';
 import { idParamsValidation } from './validations/Atoms/Params/IdParamsValidations';
 import { DiceFaceUpdateBodyValidations } from './validations/Atoms/Body/DiceFaceUpdateValidations';
+import { DiceFaceValidations } from './validations/Atoms/QueryParameters/DiceFaceValidations';
 import SocketSystem from '../libs/SocketActions/SocketSystem';
 
 export default class FaceController extends AppController implements IAppController {
@@ -25,6 +25,13 @@ export default class FaceController extends AppController implements IAppControl
 	getRoute(): Router {
 		this.router.get('/', this.getAll.bind(this));
 		this.router.get('/current', this.getCurrent.bind(this));
+		this.router.post(
+			'/settings/start',
+			DiceFaceValidations,
+			FormErrorMiddleware,
+			this.startCurrentFaceSetting.bind(this)
+		);
+		this.router.post('/settings/stop', this.stopCurrentFaceSetting.bind(this));
 		this.router.patch(
 			'/:id',
 			idParamsValidation,
@@ -35,75 +42,36 @@ export default class FaceController extends AppController implements IAppControl
 		return this.router;
 	}
 
-	async initFaceDefault(override = false) {
-		if (override || !(await DiceFace.getFace(1))) {
-			logguer.d('DiceFaces seeding...');
-			const faceIds = [1, 2, 3, 4, 5, 6, 7, 8];
-			const faceTitle = [
-				'Code',
-				'Code Review',
-				'Réunion',
-				'Read Documentation',
-				'Help others',
-				'Pause',
-				'debug',
-				'Write documentation',
-			];
-			const faceSlackStatus = [
-				'En train de coder',
-				'En pleine code review',
-				'En Réunion, Ne pas déranger !',
-				'Lit de le documentation',
-				"Est en train d'aider des gens",
-				'Est en pause',
-				'Planche sur un bug',
-				'Utilise sa plus belle plume',
-			];
-			const faceSlackEmoji = [
-				':computer:',
-				':open_book:',
-				':date:',
-				':newspaper:',
-				':fire_engine:',
-				':coffee:',
-				':bug:',
-				':memo:',
-			];
-			const faceColor = [
-				'rgb(33, 150, 243)',
-				'rgb(42, 188, 208)',
-				'rgb(167, 215, 46)',
-				'rgb(254, 215, 58)',
-				'rgb(249, 185, 61)',
-				'rgb(227, 44, 105)',
-				'rgb(104, 62, 175)',
-				'rgb(56, 64, 70)',
-			];
-			for (const [index, faceId] of faceIds.entries()) {
-				const dice = await DiceFace.define(
-					true,
-					faceId,
-					faceTitle[index] || `Face ${faceId}`,
-					faceColor[index] || 'blue',
-					{
-						text: faceSlackStatus[index],
-						emoji: faceSlackEmoji[index],
-					}
-				);
-				logguer.d('DiceFaces define :', dice);
-			}
-		} else {
-			logguer.d('DiceFaces already seeded.');
-		}
-		const settingDice = await DiceFace.getCurrentSettings();
-		if (settingDice) {
-			SocketSystem.fireSettingDice(settingDice);
-		}
-	}
-
 	private async getAll(_: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			res.send(await DiceFace.getAll());
+		} catch (err) {
+			if (err instanceof ModelError) {
+				return next(err);
+			}
+			next(new ControllerError(500, 'unable to get all', err.stack));
+		}
+	}
+
+	private async startCurrentFaceSetting(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			await DiceFace.stopCurrentSettings();
+			SocketSystem.fireSettingDice();
+			const diceFace = await DiceFace.setCurrentSettings(Number(req.query['face']));
+			SocketSystem.fireSettingDice(diceFace);
+			res.send(diceFace);
+		} catch (err) {
+			if (err instanceof ModelError) {
+				return next(err);
+			}
+			next(new ControllerError(500, 'unable to get all', err.stack));
+		}
+	}
+
+	private async stopCurrentFaceSetting(_: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			res.send(await DiceFace.stopCurrentSettings());
+			SocketSystem.fireSettingDice();
 		} catch (err) {
 			if (err instanceof ModelError) {
 				return next(err);

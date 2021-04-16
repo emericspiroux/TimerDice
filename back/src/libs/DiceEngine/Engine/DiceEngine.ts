@@ -1,5 +1,4 @@
 import DiceObject from '../DiceObject/DiceObject';
-import { DiceOnChangePosition } from '../Types/Dice.types';
 import DiceBLE from './DiceBLE';
 import logguer from 'basic-log';
 import SocketSystem from '../../SocketActions/SocketSystem';
@@ -17,8 +16,9 @@ export default class DiceEngine {
 		this.ble = new DiceBLE();
 	}
 
-	start() {
+	start(override = false) {
 		logguer.d('Start DiceEngine');
+		this.seedFaceDefault(override);
 		this.ble.setOnDetectDice(this.onChange.bind(this));
 		this.ble.start('TimerDice');
 	}
@@ -97,5 +97,71 @@ export default class DiceEngine {
 		logguer.d('Stop setting');
 		await DiceFace.stopCurrentSettings();
 		SocketSystem.fireSettingDice();
+	}
+
+	async seedFaceDefault(override = false) {
+		if (override || !(await DiceFace.getFace(1))) {
+			logguer.d('DiceFaces seeding...');
+			const faceIds = [1, 2, 3, 4, 5, 6, 7, 8];
+			const faceTitle = [
+				'Code',
+				'Code Review',
+				'Réunion',
+				'Read Documentation',
+				'Help others',
+				'Pause',
+				'debug',
+				'Write documentation',
+			];
+			const faceSlackStatus = [
+				'En train de coder',
+				'En pleine code review',
+				'En Réunion, Ne pas déranger !',
+				'Lit de le documentation',
+				"Est en train d'aider des gens",
+				'Est en pause',
+				'Planche sur un bug',
+				'Utilise sa plus belle plume',
+			];
+			const faceSlackEmoji = [
+				':computer:',
+				':open_book:',
+				':date:',
+				':newspaper:',
+				':fire_engine:',
+				':coffee:',
+				':bug:',
+				':memo:',
+			];
+			const faceColor = [
+				'rgb(33, 150, 243)',
+				'rgb(42, 188, 208)',
+				'rgb(167, 215, 46)',
+				'rgb(254, 215, 58)',
+				'rgb(249, 185, 61)',
+				'rgb(227, 44, 105)',
+				'rgb(104, 62, 175)',
+				'rgb(56, 64, 70)',
+			];
+			for (const [index, faceId] of faceIds.entries()) {
+				const dice = await DiceFace.define(
+					true,
+					faceId,
+					faceTitle[index] || `Face ${faceId}`,
+					faceColor[index] || 'blue',
+					{
+						text: faceSlackStatus[index],
+						emoji: faceSlackEmoji[index],
+					}
+				);
+				logguer.d('DiceFaces define :', dice);
+			}
+		} else {
+			logguer.d('DiceFaces already seeded.');
+		}
+		const settingDice = await DiceFace.getCurrentSettings();
+		if (settingDice) {
+			SocketSystem.fireSettingDice(settingDice);
+		}
 	}
 }

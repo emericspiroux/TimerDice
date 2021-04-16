@@ -4,19 +4,20 @@
 }
 
 .UpdateFaceForm__input {
-
 }
 
 .UpdateFaceForm__colorPicker {
-  margin: auto
+  margin: auto;
 }
 
-.UpdateFaceForm__image {
+.DiceSettings__image {
   margin: auto;
 }
 
 .UpdateFaceForm__button {
-  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .UpdateFaceForm__slack {
@@ -30,7 +31,6 @@
 }
 
 .UpdateFaceForm__slack__closeEmoji {
-
 }
 
 .UpdateFaceForm__input-slack {

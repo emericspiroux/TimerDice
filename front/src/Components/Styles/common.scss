@@ -33,7 +33,7 @@ textarea {
   font-weight: 600;
 }
 
-input[type=text] {
+input[type='text'] {
   height: 50px;
   font-size: 18px;
   border-radius: 50px;
@@ -51,9 +51,17 @@ input[type=text] {
   border-radius: 50px;
   background-color: transparent;
   font-size: 18px;
+  cursor: pointer;
   &.button-blue {
     background-color: $blue;
     color: white;
+  }
+  &.button-back {
+    background-color: white;
+    color: $grey;
+    :hover {
+      color: $blue;
+    }
   }
   &:focus {
     outline: none;
@@ -87,7 +95,7 @@ input[type=text] {
 }
 
 .tooltip .tooltiptext::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 100%;
   left: 50%;
