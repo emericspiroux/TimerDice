@@ -1,0 +1,45 @@
+@import './color.scss';
+
+.rbc-time-view {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.rbc-toolbar-label {
+  text-transform: capitalize;
+  color: $orange;
+  font-weight: 600;
+}
+
+span.rbc-btn-group {
+  button {
+    background-color: $orange;
+    color: white;
+    border-color: white;
+    cursor: pointer;
+    &:hover {
+      background-color: $orange;
+      color: white;
+      border-color: white;
+    }
+    &:focus {
+      background-color: $orange;
+      color: white;
+      border-color: white;
+      outline: none;
+      &:active {
+        background-color: $orange-light;
+        color: white;
+        border-color: white;
+      }
+    }
+    &:first-child:not(:last-child) {
+      border-top-left-radius: 50px;
+      border-bottom-left-radius: 50px;
+    }
+    &:last-child {
+      border-top-right-radius: 50px;
+      border-bottom-right-radius: 50px;
+    }
+  }
+}

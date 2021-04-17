@@ -7,7 +7,6 @@
   box-sizing: border-box;
   padding-top: 16px;
   padding-left: 16px;
-  height: 100%;
   .rbc-current-time-indicator {
     z-index: 0;
   }
@@ -21,6 +20,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 300px;
 }
 
 .CalendarPage__donuts__element {
@@ -28,13 +28,11 @@
 }
 
 .CalendarPage__calendar {
-  height: 320px;
 }
 
 .CalendarPage__info__container {
   display: flex;
   flex-direction: column;
-  height: calc(100% - 50px);
   position: relative;
 }
 

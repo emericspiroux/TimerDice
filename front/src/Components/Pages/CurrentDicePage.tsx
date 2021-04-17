@@ -241,6 +241,11 @@ export default function CurrentDicePage() {
           })}
           onRangeChange={onRangeChange}
           style={{ width: '100%' }}
+          messages={{
+            today: "Aujourd'hui",
+            next: 'Suivant',
+            previous: 'Précedent',
+          }}
           resizable
           selectable
         />

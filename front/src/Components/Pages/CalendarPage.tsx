@@ -176,6 +176,11 @@ export default function CalendarPage() {
               onSelectEvent={onSelected}
               allDayAccessor={() => false}
               eventPropGetter={eventStyleGetter}
+              messages={{
+                today: 'Cette semaine',
+                next: 'Suivante',
+                previous: 'Précedente',
+              }}
               slotPropGetter={() => ({
                 style: {
                   backgroundColor: 'white',

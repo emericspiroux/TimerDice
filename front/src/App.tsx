@@ -4,6 +4,8 @@ import { PersistGate } from 'redux-persist/integration/react';
 import ModalContainer from './Components/Organisms/ModalContainer/ModalContainer';
 import RouteContent from './Routes';
 
+import './Components/Styles/calendar.scss';
+
 export default function App({ store, persistor }) {
   return (
     <Provider store={store}>
